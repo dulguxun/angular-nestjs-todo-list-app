@@ -1,0 +1,16 @@
+<h1 *ngIf="name">Welcome {{ name }}</h1> 
+<h2>Your To-do Lists:</h2>
+<form [formGroup]="form" (ngSubmit)="submitTodo()">
+  <input type="text" formControlName="title" placeholder="Enter task title">
+  <button type="submit">Save</button>
+</form>
+
+<!-- List of tasks -->
+<ul>
+  <li *ngFor="let task of tasks">
+    <strong>{{task.id}}, {{ task.title }}</strong>
+    <button (click)="selectTask(task)">Edit</button>
+    <button (click)="deleteTask(task.id)">Delete</button>
+  </li>
+</ul>
+

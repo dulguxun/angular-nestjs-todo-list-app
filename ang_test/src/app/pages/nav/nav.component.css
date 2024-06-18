@@ -1,0 +1,38 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Navbar Styles */
+  .navbar {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+  }
+  
+  .navbar-nav .nav-link {
+    color: #ffffff;
+    transition: color 0.3s;
+  }
+  
+  .navbar-nav .nav-link:hover {
+    color: #dddddd;
+  }
+  
+  /* Container */
+  .container-fluid {
+    padding: 0 15px;
+  }
+  
+  /* Active Link Styles */
+  .nav-item .nav-link.active {
+    color: #ff8800;
+  }
+  
