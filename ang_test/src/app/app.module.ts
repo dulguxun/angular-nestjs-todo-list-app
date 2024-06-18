@@ -10,12 +10,14 @@ import {HttpClientModule} from '@angular/common/http';
 import { UserModule } from './pages/user/user.module';
 import { TodoModule } from './pages/todo/todo.module';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { PaginationComponent } from './pagination/pagination.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     NavComponent,
+    // PaginationComponent
   ],
   imports: [
     BrowserModule,

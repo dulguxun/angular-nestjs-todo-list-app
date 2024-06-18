@@ -17,6 +17,9 @@ interface Task {
 export class TodoComponent implements OnInit {
   form!: FormGroup;
   tasks: Task[] = [];
+  totalTasks: number = 0;
+  page: number = 1;
+  pageSize: number = 10;
   name: string | null = null;
   selectedTask: Task | null = null;
 
@@ -31,15 +34,15 @@ export class TodoComponent implements OnInit {
       title: '',
     });
 
-    // Fetch tasks when component initializes
     this.fetchTasks();
   }
 
   fetchTasks(): void {
     const token = localStorage.getItem('token');
-    this.todoService.fetchTasks(token).subscribe(
-      (tasks) => {
-        this.tasks = tasks;
+    this.todoService.fetchTasks(token, this.page, this.pageSize).subscribe(
+      (res) => {
+        this.tasks = res.tasks;
+        this.totalTasks = res.total;
       },
       (error) => {
         console.error("Error fetching tasks:", error);
@@ -52,7 +55,6 @@ export class TodoComponent implements OnInit {
     const token = localStorage.getItem('token');
 
     if (this.selectedTask) {
-      // Update task
       this.todoService.updateTask(this.selectedTask.id, title, token).subscribe(
         (res) => {
           console.log("Task update successful:", res);
@@ -94,5 +96,10 @@ export class TodoComponent implements OnInit {
   selectTask(task: Task): void {
     this.selectedTask = task;
     this.form.get('title')?.setValue(task.title);
+  }
+
+  changePage(page: number): void {
+    this.page = page;
+    this.fetchTasks();
   }
 }
