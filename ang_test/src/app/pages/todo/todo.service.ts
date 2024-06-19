@@ -26,6 +26,18 @@ export class TodoService {
     });
   }
 
+  // searchTasks(token: string | null, search: string): Observable<{ tasks: Task[], total: number }> {
+  //   return this.http.get<{ tasks: Task[], total: number }>('http://localhost:3000/task/search', {
+  //     headers: new HttpHeaders({
+  //       'Authorization': `Bearer ${token}`
+  //     }),
+  //     params: {
+  //       search: search
+  //     }
+  //   });
+  // }
+
+
   addTask(title: string, token: string | null): Observable<{ message: string; tasks: Task[] }> {
     return this.http.post<{ message: string; tasks: Task[] }>('http://localhost:3000/task/add', { title }, {
       headers: new HttpHeaders({
@@ -48,5 +60,9 @@ export class TodoService {
         'Authorization': `Bearer ${token}`
       })
     });
+  }
+  searchTasks(query: string, token: string | null): Observable<Task[]> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<Task[]>(`http://localhost:3000/task/search?search=${query}`, { headers });
   }
 }

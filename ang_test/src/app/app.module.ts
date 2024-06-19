@@ -10,7 +10,7 @@ import {HttpClientModule} from '@angular/common/http';
 import { UserModule } from './pages/user/user.module';
 import { TodoModule } from './pages/todo/todo.module';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { PaginationComponent } from './pagination/pagination.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
   declarations: [
@@ -26,7 +26,8 @@ import { PaginationComponent } from './pagination/pagination.component';
     ReactiveFormsModule,
     HttpClientModule,
     UserModule,
-    TodoModule
+    TodoModule,
+    // MatPaginatorModule,
   ],
   providers: [
     provideAnimationsAsync()

@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TodoComponent } from './todo.component';
 import { TodoRoutingModule } from './todo-routing.module';
-import { PaginationComponent } from '../../pagination/pagination.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
-  declarations: [TodoComponent, PaginationComponent],
-  imports: [CommonModule,ReactiveFormsModule,TodoRoutingModule
+  declarations: [TodoComponent],
+  imports: [CommonModule,ReactiveFormsModule,TodoRoutingModule, MatPaginatorModule
   ],
   providers: [
   ],

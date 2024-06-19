@@ -1,21 +1,32 @@
-<div>
+<div class="todo-container">
+  <h1>Todo List</h1>
+  
+  <!-- Search Form -->
+  <form [formGroup]="searchForm" (ngSubmit)="searchTasks()">
+    <input type="text" formControlName="search" placeholder="Search tasks..." />
+    <button type="submit">Search</button>
+  </form>
+
   <form [formGroup]="form" (ngSubmit)="submitTodo()">
-    <input formControlName="title" placeholder="Task title">
-    <button type="submit">{{ selectedTask ? 'Update' : 'Add' }} Task</button>
+    <input type="text" formControlName="title" placeholder="Add a new task..." />
+    <button type="submit">{{ selectedTask ? 'Update Task' : 'Add Task' }}</button>
   </form>
 
   <ul>
     <li *ngFor="let task of tasks">
-      {{ task.title }}
-      <button (click)="selectTask(task)">Edit</button>
-      <button (click)="deleteTask(task.id)">Delete</button>
+      <span class="task-details">{{ task.title }}</span>
+      <div class="task-actions">
+        <button class="edit" (click)="selectTask(task)">Edit</button>
+        <button class="delete" (click)="deleteTask(task.id)">Delete</button>
+      </div>
     </li>
   </ul>
 
-<app-pagination
-    [totalItems]="totalTasks"
-    [currentPage]="page"
-    [pageSize]="pageSize"
-    (pageChange)="changePage($event)">
-</app-pagination>
+  <mat-paginator [length]="totalTasks"
+                 [pageSize]="pageSize"
+                 [pageSizeOptions]="[3, 10, 20]"
+                 (page)="onPageChange($event)">
+  </mat-paginator>
+
+  <button (click)="logout()">Logout</button>
 </div>

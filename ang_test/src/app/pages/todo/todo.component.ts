@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TodoService } from './todo.service';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 interface Task {
   id: number;
@@ -16,12 +17,15 @@ interface Task {
 })
 export class TodoComponent implements OnInit {
   form!: FormGroup;
+  searchForm!: FormGroup;
   tasks: Task[] = [];
-  totalTasks: number = 0;
-  page: number = 1;
-  pageSize: number = 10;
   name: string | null = null;
   selectedTask: Task | null = null;
+  totalTasks: number = 0;
+  pageSize: number = 5;
+  currentPage: number = 0;
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -34,17 +38,22 @@ export class TodoComponent implements OnInit {
       title: '',
     });
 
+    this.searchForm = this.formBuilder.group({
+      search: '',
+    });
+
     this.fetchTasks();
   }
 
-  fetchTasks(): void {
+  fetchTasks(pageIndex: number = 0, pageSize: number = 10): void {
     const token = localStorage.getItem('token');
-    this.todoService.fetchTasks(token, this.page, this.pageSize).subscribe(
-      (res) => {
-        this.tasks = res.tasks;
-        this.totalTasks = res.total;
+    this.todoService.fetchTasks(token, pageIndex + 1, pageSize).subscribe(
+      (response: { tasks: Task[], total: number }) => {
+        this.tasks = response.tasks;
+        this.totalTasks = response.total;
+        this.paginator.pageIndex = pageIndex;
       },
-      (error) => {
+      (error: any) => {
         console.error("Error fetching tasks:", error);
       }
     );
@@ -55,25 +64,26 @@ export class TodoComponent implements OnInit {
     const token = localStorage.getItem('token');
 
     if (this.selectedTask) {
+      // Update task
       this.todoService.updateTask(this.selectedTask.id, title, token).subscribe(
-        (res) => {
+        (res: any) => {
           console.log("Task update successful:", res);
           this.selectedTask = null;
           this.form.get('title')?.setValue('');
-          this.fetchTasks();
+          this.fetchTasks(this.currentPage, this.pageSize);
         },
-        (error) => {
+        (error: any) => {
           console.error("Error updating task:", error);
         }
       );
     } else {
       this.todoService.addTask(title, token).subscribe(
-        (res) => {
+        (res: any) => {
           console.log("Task addition successful:", res);
           this.form.get('title')?.setValue('');
-          this.fetchTasks();
+          this.fetchTasks(this.currentPage, this.pageSize);
         },
-        (error) => {
+        (error: any) => {
           console.error("Error adding task:", error);
         }
       );
@@ -83,11 +93,11 @@ export class TodoComponent implements OnInit {
   deleteTask(id: number): void {
     const token = localStorage.getItem('token');
     this.todoService.deleteTask(id, token).subscribe(
-      (res) => {
+      (res: any) => {
         console.log("Task deletion successful:", res);
-        this.fetchTasks();
+        this.fetchTasks(this.currentPage, this.pageSize);
       },
-      (error) => {
+      (error: any) => {
         console.error("Error deleting task:", error);
       }
     );
@@ -98,8 +108,28 @@ export class TodoComponent implements OnInit {
     this.form.get('title')?.setValue(task.title);
   }
 
-  changePage(page: number): void {
-    this.page = page;
-    this.fetchTasks();
+  searchTasks(): void {
+    const query = this.searchForm.get('search')?.value;
+    const token = localStorage.getItem('token');
+
+    this.todoService.searchTasks(query, token).subscribe(
+      (tasks: Task[]) => {
+        this.tasks = tasks;
+      },
+      (error: any) => {
+        console.error("Error searching tasks:", error);
+      }
+    );
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.fetchTasks(this.currentPage, this.pageSize);
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
   }
 }
