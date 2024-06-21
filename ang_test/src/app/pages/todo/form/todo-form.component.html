@@ -1,0 +1,11 @@
+<div class="form-container">
+    <form [formGroup]="form" (ngSubmit)="submitTodo()">
+      <mat-form-field>
+        <input matInput placeholder="Task Title" formControlName="title" class="mat-input-element">
+      </mat-form-field>
+      <button class="submit-button" mat-raised-button color="primary" type="submit">
+        {{ selectedTaskId ? 'Update Task' : 'Add Task' }}
+      </button>
+    </form>
+  </div>
+  

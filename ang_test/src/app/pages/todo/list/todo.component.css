@@ -1,0 +1,145 @@
+/* Container for the tasks list and controls */
+.todo-container {
+  margin: 40px auto;
+  padding: 20px;
+  max-width: 600px;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+/* Add Task button */
+.add-task-button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background: #6200ea;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.add-task-button:hover {
+  background: #3700b3;
+}
+
+/* Search container */
+.search-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  flex-grow: 1;
+}
+
+.search-button {
+  margin-left: 10px;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background: #03a9f4;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.search-button:hover {
+  background: #0288d1;
+}
+
+/* Individual task item */
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+/* Task info section */
+.task-info {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Task title */
+.task-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Task dates */
+.task-dates {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+}
+
+.task-dates small {
+  display: block;
+}
+
+/* Task action buttons */
+.task-actions button {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  background: #eeeeee;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.task-actions button:hover {
+  background: #cccccc;
+}
+
+/* Edit button */
+.task-actions .edit-button {
+  background: #4caf50;
+  color: white;
+}
+
+.task-actions .edit-button:hover {
+  background: #388e3c;
+}
+
+/* Delete button */
+.task-actions .delete-button {
+  background: #f44336;
+  color: white;
+}
+
+.task-actions .delete-button:hover {
+  background: #d32f2f;
+}
+
+/* Favorite button */
+.task-actions .favorite-button {
+  background: #ff9800;
+  color: white;
+}
+
+.task-actions .favorite-button:hover {
+  background: #f57c00;
+}
+
+/* Paginator */
+.mat-paginator {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}

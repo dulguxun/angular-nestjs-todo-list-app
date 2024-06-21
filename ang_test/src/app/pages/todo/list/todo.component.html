@@ -1,0 +1,30 @@
+<div class="todo-container">
+  <button class="add-task-button" mat-raised-button color="primary" [routerLink]="['/todo/add']">Add Task</button>
+
+  Search Task Input
+  <div class="search-container">
+    <mat-form-field class="search-input">
+      <input matInput placeholder="Search Tasks" [(ngModel)]="searchTerm" />
+    </mat-form-field>
+    <button class="search-button" mat-raised-button color="accent" (click)="searchTasks()">Search</button>
+  </div>
+  <div *ngFor="let task of tasks" class="task-item">
+    <div class="task-info">
+      <div class="task-title">{{ task.title }}</div>
+      <div class="task-dates">
+        <small>Created: {{ task.createdAt | date: 'short' }}</small>
+        <small>Updated: {{ task.updatedAt | date: 'short' }}</small>
+      </div>
+    </div>
+    <div class="task-actions">
+      <button mat-button (click)="navigateToEditTask(task)">Edit</button>
+      <button mat-button (click)="deleteTask(task.id)">Delete</button>
+      <button mat-icon-button (click)="toggleFavorite(task)">
+        <mat-icon>{{ task.favoriteTask ? 'favorite' : 'favorite_border' }}</mat-icon>
+      </button>
+    </div>
+  </div>
+  
+
+  <mat-paginator [length]="totalItems" [pageSize]="pageSize" (page)="onPageChange($event)"></mat-paginator>
+</div>

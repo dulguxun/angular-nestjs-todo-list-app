@@ -6,8 +6,7 @@ import { AuthGuard } from './guards/auth.guard';
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'user', loadChildren: () => import('./pages/user/user.module').then(m => m.UserModule)},
-  // from example   {path: '**', component:ProductListComponent, pathMatch:'full', canActivate: [AuthGuard]}
-  {path: 'todo', loadChildren: () => import('./pages/todo/todo.module').then(m => m.TodoModule), canActivate: [AuthGuard]}
+  {path: 'todo', loadChildren: () => import('./pages/todo/list/todo.module').then(m => m.TodoModule), canActivate: [AuthGuard]}
 ];
 
 @NgModule({
