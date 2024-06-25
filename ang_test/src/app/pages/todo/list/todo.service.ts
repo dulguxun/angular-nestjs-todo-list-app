@@ -24,6 +24,13 @@ export class TodoService {
   }
 
   searchTasks(token: string | null, searchTerm: string, page: number = 1, limit: number = 6): Observable<any> {
+    // Log the parameters
+    console.log('Search Parameters:', {
+        search: searchTerm,
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
     return this.http.get(`${this.apiUrl}/search`, {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + token,
@@ -34,8 +41,7 @@ export class TodoService {
         limit: limit.toString(),
       },
     });
-  }
-  
+}
 
   addTask(title: string, token: string | null): Observable<any> {
     return this.http.post(

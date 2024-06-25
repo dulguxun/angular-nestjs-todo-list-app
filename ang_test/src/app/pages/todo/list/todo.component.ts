@@ -3,8 +3,10 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { TodoService } from './todo.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageEvent } from '@angular/material/paginator';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CustomDatePipe } from '../../datepipe/custom-date.pipe';
+import { RouterModule } from '@angular/router';
+import { DetailComponent } from '../detail/detail.component';
 import { HttpHeaders } from '@angular/common/http';
 
 interface Task {
@@ -36,16 +38,29 @@ export class TodoComponent implements OnInit {
     private formBuilder: FormBuilder,
     private todoService: TodoService,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
     
   ) {}
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      title: '',
+      title: ''
     });
 
-    this.fetchTasks(this.currentPage + 1, this.pageSize); // Adjust for zero-based index
+    // Subscribe to query parameters and perform the search based on them
+    this.route.queryParams.subscribe(params => {
+      this.searchTerm = params['title'] || '';
+      this.currentPage = +params['page'] - 1 || 0;
+      
+      if (params['title'] || params['page']) {
+        // Perform search if there are query parameters
+        this.searchTasks();
+      } else {
+        // Fetch all tasks if no query parameters
+        this.fetchTasks(this.currentPage + 1, this.pageSize);
+      }
+    });
   }
 
   fetchTasks(page: number, pageSize: number): void {
@@ -68,12 +83,36 @@ export class TodoComponent implements OnInit {
       (response: { tasks: Task[], total: number }) => {
         this.tasks = response.tasks;
         this.totalItems = response.total;
+        
+        // Update the URL with query parameters
+        this.router.navigate([], {
+          queryParams: {
+            title: this.searchTerm,
+            page: this.currentPage + 1,
+          },
+          queryParamsHandling: 'merge', // keeps any existing query parameters
+        });
       },
       (error: any) => {
         console.error('Error searching tasks:', error);
       }
     );
   }
+  onSearch(): void {
+    // Update the URL with search parameters and refresh the component
+    this.router.navigate([], {
+      queryParams: {
+        title: this.form.get('title')?.value || '',
+        page: 1, // Reset to first page on new search
+        limit: this.pageSize,
+      },
+      queryParamsHandling: 'merge', // keeps any existing query parameters
+    }).then(() => {
+      // Perform the search after the URL is updated
+      this.searchTasks();
+    });
+  }
+
   
 
   submitTodo(): void {
