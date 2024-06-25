@@ -10,7 +10,7 @@ export class TodoFormService {
 
   constructor(private http: HttpClient) {}
 
-  fetchTasks(token: string | null, page: number = 1, limit: number = 3): Observable<any> {
+  fetchTasks(token: string | null, page: number = 1, limit: number = 1000): Observable<any> {
     return this.http.get(this.apiUrl, {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + token,
@@ -22,10 +22,10 @@ export class TodoFormService {
     });
   }
 
-  addTask(title: string, token: string | null): Observable<any> {
+  addTask(title: string, description: string, token: string | null): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/add`,
-      { title },
+      { title, description },
       {
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + token,
@@ -34,10 +34,10 @@ export class TodoFormService {
     );
   }
 
-  updateTask(id: number, title: string, token: string | null): Observable<any> {
+  updateTask(id: number, title: string, description: string, token: string | null): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/update`,
-      { id, title },
+      { id, title, description },
       {
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + token,

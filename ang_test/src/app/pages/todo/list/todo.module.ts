@@ -12,11 +12,18 @@ import { TodoFormModule } from '../form/todo-form.module';
 
 import { CustomDatePipe } from '../../datepipe/custom-date.pipe';
 import { MatIconModule } from '@angular/material/icon';
+import { DetailComponent } from '../detail/detail.component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { LuxonDatePipe } from '../detail/luxon.datepipe';
+
 
 @NgModule({
   declarations: [
-    TodoComponent, 
-    CustomDatePipe],
+    TodoComponent,
+    DetailComponent, 
+    CustomDatePipe,
+    LuxonDatePipe
+  ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -28,7 +35,9 @@ import { MatIconModule } from '@angular/material/icon';
     MatInputModule, 
     FormsModule,
     TodoFormModule,
-    MatIconModule
+    MatIconModule,
+    MatGridListModule,
+    
     
   ],
   providers: [

@@ -1,30 +1,41 @@
-<div class="todo-container">
-  <button class="add-task-button" mat-raised-button color="primary" [routerLink]="['/todo/add']">Add Task</button>
-
-  Search Task Input
-  <div class="search-container">
-    <mat-form-field class="search-input">
-      <input matInput placeholder="Search Tasks" [(ngModel)]="searchTerm" />
-    </mat-form-field>
-    <button class="search-button" mat-raised-button color="accent" (click)="searchTasks()">Search</button>
-  </div>
-  <div *ngFor="let task of tasks" class="task-item">
-    <div class="task-info">
-      <div class="task-title">{{ task.title }}</div>
-      <div class="task-dates">
-        <small>Created: {{ task.createdAt | date: 'short' }}</small>
-        <small>Updated: {{ task.updatedAt | date: 'short' }}</small>
-      </div>
-    </div>
-    <div class="task-actions">
-      <button mat-button (click)="navigateToEditTask(task)">Edit</button>
-      <button mat-button (click)="deleteTask(task.id)">Delete</button>
-      <button mat-icon-button (click)="toggleFavorite(task)">
-        <mat-icon>{{ task.favoriteTask ? 'favorite' : 'favorite_border' }}</mat-icon>
-      </button>
-    </div>
-  </div>
+<body>
   
-
+  <div class="todo-container">
+    <button class="add-task-button" mat-raised-button color="primary" [routerLink]="['/todo/add']">Add Task</button>
+    
+    <!-- Search Task Input -->
+    <div class="search-container">
+      <mat-form-field class="search-input">
+        <input matInput placeholder="Search Tasks" [(ngModel)]="searchTerm" />
+      </mat-form-field>
+      <button class="search-button" mat-raised-button color="accent" (click)="searchTasks()">Search</button>
+    </div>
+    
+    <!-- Task Grid List -->
+    <mat-grid-list cols="2" rowHeight="1:1" gutterSize="16px">
+      <mat-grid-tile *ngFor="let task of tasks" class="task-item">
+        <mat-card [ngClass]="{'favorite-task': task.favoriteTask}">
+          <mat-card-content>
+            <div class="task-info" (click)="navigateToTaskDetail(task.id)">
+              <div class="task-title" [ngClass]="{'favorite': task.favoriteTask}">{{ task.title }}</div>
+              <div class="task-description" [ngClass]="{'favorite': task.favoriteTask}">{{ task.description }}</div>
+              <div class="task-dates">
+                <small [ngClass]="{'favorite': task.favoriteTask}">Created: {{ task.createdAt | luxonDate: dateFormat }}</small>
+                <small [ngClass]="{'favorite': task.favoriteTask}">Updated: {{ task.updatedAt | luxonDate: dateFormat }}</small>
+              </div>
+            </div>
+          </mat-card-content>
+          <mat-card-actions class="task-actions">
+            <button class="edit-button" mat-button (click)="navigateToEditTask(task)">Edit</button>
+            <button class="favorite-button" mat-icon-button (click)="toggleFavorite(task)">
+              <mat-icon [ngClass]="{'favorite': task.favoriteTask, 'favorite_border': !task.favoriteTask }">{{ task.favoriteTask ? 'favorite' : 'favorite_border' }}</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </mat-grid-tile>
+    </mat-grid-list>
+    
   <mat-paginator [length]="totalItems" [pageSize]="pageSize" (page)="onPageChange($event)"></mat-paginator>
 </div>
+
+</body>

@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Post, Body, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Req, UseGuards, UnauthorizedException, ForbiddenException, Param } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { Todotable } from './todo.entity';
 import { JwtAuthGuard } from 'src/strategies/jwt-auth.guard';
@@ -16,7 +16,7 @@ export class TodoController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/add')
-  async addTask(@Req() req, @Body() taskData: { title: string }): Promise<{ message: string; tasks: Todotable[] }> {
+  async addTask(@Req() req, @Body() taskData: { title: string, description: string }): Promise<{ message: string; tasks: Todotable[] }> {
     const userId = req.user.userId;
     const newTask: Todotable = {
       id: 0,
@@ -25,6 +25,7 @@ export class TodoController {
       updatedAt: new Date(),
       favoriteTask: false,
       originalPosition: 0,
+      description: taskData.description,
       user: { id: userId } as any,
     };
     await this.todoService.addTask(newTask);
@@ -35,7 +36,7 @@ export class TodoController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/update')
-  async updateTask(@Req() req, @Body() taskData: { id: number; title: string }): Promise<{ message: string }> {
+  async updateTask(@Req() req, @Body() taskData: { id: number; title: string, description: string }): Promise<{ message: string }> {
     const userId = req.user.userId;
     const task = await this.todoService.findTaskById(taskData.id);
 
@@ -44,10 +45,11 @@ export class TodoController {
     }
 
     task.title = taskData.title;
+    task.description = taskData.description;
     task.updatedAt = new Date();
 
     await this.todoService.updateTask(task);
-    return { message: 'Task updated successfully' };
+    return { message: 'Task updated successfully'};
   }
 
   @UseGuards(JwtAuthGuard)
@@ -76,5 +78,18 @@ export class TodoController {
     const userId = req.user.userId;
     await this.todoService.toggleFavoriteTaskById(userId, taskId.id);
     return { message: 'Task favorite status updated successfully' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:id')
+  async getTaskById(@Req() req, @Param('id') id: number): Promise<Todotable> {
+    const userId = req.user.userId;
+    const task = await this.todoService.findTaskById(id);
+    console.log(task.user.id, userId);
+    if (task.user.id !== userId) {
+      
+      throw new ForbiddenException();
+    }
+    return task;
   }
 }

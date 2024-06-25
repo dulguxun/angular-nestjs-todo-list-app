@@ -21,6 +21,9 @@ export class Todotable  {
   @Column({ default: 0 })
   originalPosition: number; // Add this field
 
+  @Column({ nullable: true })
+  description: string;
+
   @ManyToOne(() => User, user => user.tasks)
   user: User;
 }

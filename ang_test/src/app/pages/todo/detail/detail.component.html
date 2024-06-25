@@ -1,0 +1,12 @@
+<div *ngIf="task">
+    <h2>Task Details</h2>
+    <p><strong>Title:</strong> {{ task.title }}</p>
+    <p><strong>Description:</strong> {{ task.description }}</p>
+    <p><strong>Created At:</strong> {{ task.createdAt | luxonDate: dateFormat }}</p>
+    <p><strong>Updated At:</strong> {{ task.updatedAt | luxonDate: dateFormat }}</p>
+    <!-- <button (click)="toggleDateFormat()">
+      {{ dateFormat.includes('HH') ? 'Switch to 12-hour format' : 'Switch to 24-hour format' }}
+    </button> -->
+    <button mat-button (click)="deleteTask(task.id)" class="delete-button">Delete</button>
+  </div>
+  <h1 *ngIf="!task">No task found.</h1>

@@ -1,4 +1,3 @@
-// src/app/pages/nav/nav.component.ts
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
@@ -18,6 +17,7 @@ export class NavComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Subscribe to authentication state changes
     this.authService.authState$.subscribe(
       (auth: boolean) => {
         this.authenticated = auth;
@@ -26,6 +26,18 @@ export class NavComponent implements OnInit {
         }
       }
     );
+
+    // Initialize the authentication state and user state from localStorage
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('loggedUser');
+
+    if (token && user) {
+      this.authService.setAuthState(true);
+      this.authService.setUserState(JSON.parse(user));
+    } else {
+      this.authService.setAuthState(false);
+      this.authService.setUserState(null);
+    }
   }
 
   logout(): void {
@@ -36,35 +48,3 @@ export class NavComponent implements OnInit {
     this.router.navigate(['/']);
   }
 }
-
-
-
-// import { Component, OnInit } from '@angular/core';
-// import { Emitters } from '../emitters/emitters';
-// import { HttpClient } from '@angular/common/http';
-// import { Router } from '@angular/router'; 
-
-// @Component({
-//   selector: 'app-nav',
-//   templateUrl: './nav.component.html',
-//   styleUrls: ['./nav.component.css']
-// })
-// export class NavComponent implements OnInit {
-//   authenticated = false;
-
-//   constructor(private http: HttpClient, private router: Router) {} // Inject Router
-
-//   ngOnInit(): void {
-//     Emitters.authEmitter.subscribe(
-//       (auth: boolean) => {
-//         this.authenticated = auth;
-//       }
-//     );
-//   }
-
-//   logout(): void {
-//     localStorage.removeItem('loggedUser');
-//     this.authenticated = false;
-//     this.router.navigate(['/']);
-//   }
-// }

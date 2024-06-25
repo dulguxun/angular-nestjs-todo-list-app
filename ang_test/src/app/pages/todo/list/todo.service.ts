@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ export class TodoService {
 
   constructor(private http: HttpClient) {}
 
-  fetchTasks(token: string | null, page: number = 1, limit: number = 3): Observable<any> {
+  fetchTasks(token: string | null, page: number = 1, limit: number = 1000): Observable<any> {
     return this.http.get(this.apiUrl, {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + token,
@@ -22,7 +23,7 @@ export class TodoService {
     });
   }
 
-  searchTasks(token: string | null, searchTerm: string, page: number = 1, limit: number = 3): Observable<any> {
+  searchTasks(token: string | null, searchTerm: string, page: number = 1, limit: number = 6): Observable<any> {
     return this.http.get(`${this.apiUrl}/search`, {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + token,
@@ -34,6 +35,7 @@ export class TodoService {
       },
     });
   }
+  
 
   addTask(title: string, token: string | null): Observable<any> {
     return this.http.post(
@@ -50,7 +52,7 @@ export class TodoService {
   updateTask(id: number, title: string, token: string | null): Observable<any> {
     return this.http.post(
       `${this.apiUrl}/update/${id}`, // Assuming '/update/:id' is your update route
-      { title },
+      { title, },
       {
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + token,
@@ -81,5 +83,18 @@ export class TodoService {
         }),
       }
     );
+  }
+
+  // getTaskById(id: number, token: string | null): Observable<any> {
+  //   return this.http.get(`${this.apiUrl}/${id}`, {
+  //     headers: new HttpHeaders({
+  //       Authorization: 'Bearer'+ token,
+  //     }),
+  //   });
+  // }
+  getTaskById(id: number, token: string | null): Observable<any> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    console.log('Requesting task ID:', id, 'with headers:', headers);
+    return this.http.get<any>(`${this.apiUrl}/${id}`, { headers });
   }
 }

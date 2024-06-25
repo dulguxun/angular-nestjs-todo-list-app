@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { CustomDatePipe } from '../../datepipe/custom-date.pipe';
+import { HttpHeaders } from '@angular/common/http';
 
 interface Task {
   id: number;
@@ -12,6 +13,7 @@ interface Task {
   createdAt: string;
   updatedAt: string;
   favoriteTask: boolean;
+  description: string;
   user: { id: number; username: string };
 }
 
@@ -25,17 +27,17 @@ export class TodoComponent implements OnInit {
   tasks: Task[] = [];
   selectedTask: Task | null = null;
   searchTerm: string = '';
-  // favorite: boolean = false;
-  // paginator
   totalItems = 0;
-  pageSize = 5;
+  pageSize = 6;
   currentPage = 0;
+  dateFormat: string = 'yyyy LLL dd, HH:mm ';
 
   constructor(
     private formBuilder: FormBuilder,
     private todoService: TodoService,
     private snackBar: MatSnackBar,
     private router: Router
+    
   ) {}
 
   ngOnInit(): void {
@@ -46,18 +48,6 @@ export class TodoComponent implements OnInit {
     this.fetchTasks(this.currentPage + 1, this.pageSize); // Adjust for zero-based index
   }
 
-  // fetchTasks(page: number, pageSize: number): void {
-  //   const token = localStorage.getItem('token');
-  //   this.todoService.fetchTasks(token, page, pageSize).subscribe(
-  //     (response: { tasks: Task[], total: number }) => {
-  //       this.tasks = response.tasks;
-  //       this.totalItems = response.total;
-  //     },
-  //     (error: any) => {
-  //       console.error('Error fetching tasks:', error);
-  //     }
-  //   );
-  // }
   fetchTasks(page: number, pageSize: number): void {
     const token = localStorage.getItem('token');
     this.todoService.fetchTasks(token, page, this.pageSize).subscribe(
@@ -84,6 +74,7 @@ export class TodoComponent implements OnInit {
       }
     );
   }
+  
 
   submitTodo(): void {
     const title = this.form.get('title')?.value;
@@ -94,6 +85,7 @@ export class TodoComponent implements OnInit {
         (res: any) => {
           this.selectedTask = null;
           this.form.get('title')?.setValue('');
+          // this.form.get('description').setValue('');
           this.fetchTasks(this.currentPage + 1, this.pageSize); // Adjust for zero-based index
           this.openSnackBar('Task updated successfully');
         },
@@ -132,6 +124,11 @@ export class TodoComponent implements OnInit {
     this.selectedTask = task;
     this.router.navigate(['/todo/edit', task.id]); // Assuming '/todo/edit/:id' is your edit route
   }
+  
+  navigateToTaskDetail(taskId: number): void {
+    this.router.navigate(['/details', taskId]); // Assuming '/details/:id' is your detail route
+    console.log('Task ID:', taskId);
+  }
 
   toggleFavorite(task: Task): void {
     const token = localStorage.getItem('token');
@@ -146,12 +143,16 @@ export class TodoComponent implements OnInit {
       }
     );
   }
-  
+  toggleDateFormat(): void {
+    // Toggle between 12-hour and 24-hour format
+    this.dateFormat = this.dateFormat.includes('HH') ? 'yyyy LLL dd, hh:mm a' : 'yyyy LLL dd, HH:mm';
+  }
   
 
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
+    // this.searchTasks();
     this.fetchTasks(this.currentPage + 1, this.pageSize); // Adjust for zero-based index
   }
 

@@ -22,6 +22,7 @@ export class TodoFormComponent implements OnInit {
   ) {
     this.form = this.formBuilder.group({
       title: '',
+      description: '',
     });
   }
 
@@ -43,6 +44,7 @@ export class TodoFormComponent implements OnInit {
         const task = response.tasks.find((task: any) => task.id === id);
         if (task) {
           this.form.get('title')?.setValue(task.title);
+          this.form.get('description')?.setValue(task.description);
         }
       },
       error => {
@@ -53,11 +55,13 @@ export class TodoFormComponent implements OnInit {
 
   submitTodo(): void {
     const title = this.form.get('title')?.value;
+    const description = this.form.get('description')?.value;
     const token = localStorage.getItem('token');
 
     if (this.selectedTaskId !== null) {
-      this.todoFormService.updateTask(this.selectedTaskId, title, token).subscribe(
+      this.todoFormService.updateTask(this.selectedTaskId, title, description, token).subscribe(
         () => {
+
           this.openSnackBar('Task updated successfully');
           this.router.navigate(['/todo']);
         },
@@ -66,7 +70,7 @@ export class TodoFormComponent implements OnInit {
         }
       );
     } else {
-      this.todoFormService.addTask(title, token).subscribe(
+      this.todoFormService.addTask(title, description, token).subscribe(
         () => {
           this.openSnackBar('Task added successfully');
           this.router.navigate(['/todo']);
