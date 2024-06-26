@@ -15,6 +15,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { DetailComponent } from '../detail/detail.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { LuxonDatePipe } from '../detail/luxon.datepipe';
+import { MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../detail/confirm-dialog.component';
 
 
 @NgModule({
@@ -22,7 +24,8 @@ import { LuxonDatePipe } from '../detail/luxon.datepipe';
     TodoComponent,
     DetailComponent, 
     CustomDatePipe,
-    LuxonDatePipe
+    LuxonDatePipe,
+    ConfirmDialogComponent
   ],
   imports: [
     CommonModule,
@@ -37,7 +40,7 @@ import { LuxonDatePipe } from '../detail/luxon.datepipe';
     TodoFormModule,
     MatIconModule,
     MatGridListModule,
-    
+    MatDialogModule,
     
   ],
   providers: [

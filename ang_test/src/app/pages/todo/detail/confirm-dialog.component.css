@@ -1,0 +1,40 @@
+/* Styles for the Confirm Delete dialog */
+h1.mat-dialog-title {
+    font-size: 24px;
+    color: #673ab7; /* Purple color */
+    margin: 0;
+  }
+  
+  .mat-dialog-content {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .mat-dialog-actions button {
+    margin-left: 10px; /* Adjust spacing between buttons */
+    font-size: 16px;
+    min-width: 64px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  
+  .mat-dialog-actions button.mat-button {
+    background-color: #673ab7; /* Purple color */
+    color: white;
+  }
+  
+  .mat-dialog-actions button.mat-button:hover {
+    background-color: #0288d1; /* Darker blue on hover */
+    transform: translateY(-2px);
+  }
+  
+  .mat-dialog-actions button.mat-button:not(:last-child) {
+    margin-right: 8px; /* Adjust spacing between buttons */
+  }
+  

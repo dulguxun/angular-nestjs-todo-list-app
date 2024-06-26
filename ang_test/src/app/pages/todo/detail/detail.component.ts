@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TodoService } from '../list/todo.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from './confirm-dialog.component'; // Import the dialog component
 
 interface Task {
   id: number;
@@ -26,7 +28,8 @@ export class DetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private todoService: TodoService,
-    private snackBar: MatSnackBar  // Inject MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog // Inject MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -49,22 +52,29 @@ export class DetailComponent implements OnInit {
   }
 
   deleteTask(id: number): void {
-    const token = localStorage.getItem('token');
-    this.todoService.deleteTask(id, token).subscribe(
-      () => {
-        this.snackBar.open('Task deleted successfully', 'Close', {
-          duration: 3000, // Duration the snackbar should be displayed
-        });
-        this.router.navigate(['/todo']); // Corrected navigation
-      },
-      (error: any) => {
-        console.error('Error deleting task:', error);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '350px'
+    }); // Open the dialog
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const token = localStorage.getItem('token');
+        this.todoService.deleteTask(id, token).subscribe(
+          () => {
+            this.snackBar.open('Task deleted successfully', 'Close', {
+              duration: 3000,
+            });
+            this.router.navigate(['/todo']);
+          },
+          (error: any) => {
+            console.error('Error deleting task:', error);
+          }
+        );
       }
-    );
+    });
   }
 
   toggleDateFormat(): void {
-    // Toggle between 12-hour and 24-hour format
     this.dateFormat = this.dateFormat.includes('HH') ? 'yyyy LLL dd, hh:mm a' : 'yyyy LLL dd, HH:mm';
   }
 }

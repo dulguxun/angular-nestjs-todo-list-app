@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 
@@ -23,7 +23,7 @@ export class TodoService {
     });
   }
 
-  searchTasks(token: string | null, searchTerm: string, page: number = 1, limit: number = 6): Observable<any> {
+  searchTasks(token: string | null, searchTerm: string, page: number = 1, limit: number = 1000): Observable<any> {
     // Log the parameters
     console.log('Search Parameters:', {
         search: searchTerm,

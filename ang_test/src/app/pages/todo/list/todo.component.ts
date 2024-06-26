@@ -4,10 +4,7 @@ import { TodoService } from './todo.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageEvent } from '@angular/material/paginator';
 import { Router, ActivatedRoute } from '@angular/router';
-import { CustomDatePipe } from '../../datepipe/custom-date.pipe';
-import { RouterModule } from '@angular/router';
-import { DetailComponent } from '../detail/detail.component';
-import { HttpHeaders } from '@angular/common/http';
+import { debounceTime } from 'rxjs/operators';
 
 interface Task {
   id: number;
@@ -61,6 +58,13 @@ export class TodoComponent implements OnInit {
         this.fetchTasks(this.currentPage + 1, this.pageSize);
       }
     });
+    this.form.get('title')?.valueChanges
+    .pipe(debounceTime(400)) // Debounce for 400 milliseconds
+    .subscribe(() => {
+      this.searchTerm = this.form.get('title')?.value || ''; // Update searchTerm
+      this.currentPage = 0; // Reset to first page on new search
+      this.searchTasks(); // Perform the search
+    });
   }
 
   fetchTasks(page: number, pageSize: number): void {
@@ -84,14 +88,13 @@ export class TodoComponent implements OnInit {
         this.tasks = response.tasks;
         this.totalItems = response.total;
         
-        // Update the URL with query parameters
         this.router.navigate([], {
           queryParams: {
             title: this.searchTerm,
-            page: this.currentPage + 1,
+            page: this.currentPage + 1, //always reset to first page on new search
           },
-          queryParamsHandling: 'merge', // keeps any existing query parameters
         });
+
       },
       (error: any) => {
         console.error('Error searching tasks:', error);
@@ -112,7 +115,19 @@ export class TodoComponent implements OnInit {
       this.searchTasks();
     });
   }
-
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.router.navigate([], {
+      queryParams: {
+        title: null,
+        page: 1, // Reset to the first page
+      },
+      queryParamsHandling: 'merge', // keeps any existing query parameters
+    }).then(() => {
+      this.fetchTasks(1, this.pageSize);
+    });
+  }
+  
   
 
   submitTodo(): void {
@@ -191,9 +206,33 @@ export class TodoComponent implements OnInit {
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
-    // this.searchTasks();
-    this.fetchTasks(this.currentPage + 1, this.pageSize); // Adjust for zero-based index
+  
+    if (this.searchTerm) {
+      // If there is a search term, update URL with both search term and pagination
+      this.router.navigate([], {
+        queryParams: {
+          title: this.searchTerm,
+          page: this.currentPage + 1, // currentPage is zero-based, but query param expects 1-based index
+        },
+        queryParamsHandling: 'merge', // keeps any existing query parameters
+      }).then(() => {
+        // Perform the search after the URL is updated
+        this.searchTasks();
+      });
+    } else {
+      // If there is no search term, update URL with only pagination
+      this.router.navigate([], {
+        queryParams: {
+          page: this.currentPage + 1, // currentPage is zero-based, but query param expects 1-based index
+        },
+        queryParamsHandling: 'merge', // keeps any existing query parameters
+      }).then(() => {
+        // Fetch tasks for the new page
+        this.fetchTasks(this.currentPage + 1, this.pageSize);
+      });
+    }
   }
+    
 
   openSnackBar(message: string): void {
     this.snackBar.open(message, 'Close', {
