@@ -5,7 +5,7 @@ import { TodoComponent } from './todo.component';
 import { TodoRoutingModule } from './todo-routing.module';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import {MatCardModule} from '@angular/material/card'; 
+import { MatCardModule } from '@angular/material/card'; 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { TodoFormModule } from '../form/todo-form.module';

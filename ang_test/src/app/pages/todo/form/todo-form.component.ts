@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TodoFormService } from './todo-form.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,14 +19,14 @@ export class TodoFormComponent implements OnInit {
     private snackBar: MatSnackBar,
     private router: Router,
     private route: ActivatedRoute
-  ) {
-    this.form = this.formBuilder.group({
-      title: '',
-      description: '',
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
+    this.form = this.formBuilder.group({
+      title: ['', Validators.required],
+      description: [''],
+    });
+
     this.route.paramMap.subscribe(params => {
       const taskId = params.get('id');
       if (taskId) {
@@ -61,7 +61,6 @@ export class TodoFormComponent implements OnInit {
     if (this.selectedTaskId !== null) {
       this.todoFormService.updateTask(this.selectedTaskId, title, description, token).subscribe(
         () => {
-
           this.openSnackBar('Task updated successfully');
           this.router.navigate(['/todo']);
         },

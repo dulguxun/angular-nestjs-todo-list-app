@@ -1,137 +1,32 @@
-/* / Container for the tasks list and controls / */
-.todo-container {
-  margin: 40px auto;
+/* Task Details Card */
+.card-body {
   padding: 20px;
-  max-width: 600px;
-  background: #ffffff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
 }
 
-/* / Add Task button / */
-.add-task-button {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 20px;
-  font-size: 16px;
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+p {
+  margin-bottom: 5px;
+}
+
+p strong {
+  font-weight: bold;
+}
+
+.delete-button {
+  background-color: #dc3545; /* Bootstrap danger color */
+  color: #fff; /* White text */
   border: none;
-  border-radius: 5px;
-  background: #6200ea;
-  color: white;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s;
-}
-
-.add-task-button:hover {
-  background: #3700b3;
-}
-
-/* / Search container / */
-.search-container {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.search-input {
-  flex-grow: 1;
-}
-
-.search-button {
-  margin-left: 10px;
-  padding: 12px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  background: #03a9f4;
-  color: white;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.search-button:hover {
-  background: #0288d1;
-}
-
-/* / Individual task item / */
-.task-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.task-item:last-child {
-  border-bottom: none;
-}
-
-/* / Task info section / */
-.task-info {
-  display: flex;
-  flex-direction: column;
-}
-
-/* / Task title / */
-.task-title {
-  font-size: 18px;
-  font-weight: 500;
-  color: #333;
-}
-
-/* / Task dates / */
-.task-dates {
-  font-size: 12px;
-  color: #888;
-  margin-top: 5px;
-}
-
-.task-dates small {
-  display: block;
-}
-
-/* / Task action buttons / */
-.task-actions button {
-  margin-left: 10px;
-  padding: 8px 12px;
-  font-size: 14px;
-  border: none;
-  border-radius: 5px;
-  background: #eeeeee;
-  color: #333;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.task-actions button:hover {
-  background: #cccccc;
-}
-
-.delete-button{
-  font-size: 16px;
-  background: #673ab7; /* Purple color */
-  color: white;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-
+  transition: background-color 0.3s ease;
 }
 
 .delete-button:hover {
-  background: #0288d1; /* Light gray background on hover */
-  transform: translateY(-1px);
-  border: none;
-}
-
-
-/* / Paginator / */
-.mat-paginator {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
+  background-color: #c82333; /* Darker red on hover */
 }

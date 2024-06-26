@@ -1,14 +1,18 @@
 <div class="form-container">
-    <form [formGroup]="form" (ngSubmit)="submitTodo()">
+  <form [formGroup]="form" (ngSubmit)="submitTodo()">
+    <div class="form-column">
       <mat-form-field>
         <input matInput placeholder="Task Title" formControlName="title" class="mat-input-element">
+        <mat-error *ngIf="form.get('title')?.hasError('required')">
+          Title is required
+        </mat-error>
       </mat-form-field>
       <mat-form-field>
         <input matInput placeholder="Task Description" formControlName="description" class="mat-input-element">
-        </mat-form-field>
-      <button class="submit-button" mat-raised-button color="primary" type="submit">
-        {{ selectedTaskId ? 'Update Task' : 'Add Task' }}
-      </button>
-    </form>
-  </div>
-  
+      </mat-form-field>
+    </div>
+    <button class="submit-button" mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+      {{ selectedTaskId ? 'Update Task' : 'Add Task' }}
+    </button>
+  </form>
+</div>

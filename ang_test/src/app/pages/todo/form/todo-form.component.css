@@ -1,39 +1,44 @@
 /* Container for the form */
 .form-container {
-    margin: 40px auto;
-    padding: 20px;
-    max-width: 500px;
-    background: #ffffff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-  }
-  
-  /* Form field */
-  .mat-form-field {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-  
-  /* Input field */
-  .mat-input-element {
-    font-size: 16px;
-  }
-  
-  /* Submit button */
-  .submit-button {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    background: #6200ea;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .submit-button:hover {
-    background: #3700b3;
-  }
-  
+  margin: 40px auto;
+  padding: 20px;
+  max-width: 500px;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+/* Form column layout */
+.form-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Form field */
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* Input field */
+.mat-input-element {
+  font-size: 16px;
+}
+
+/* Submit button */
+.submit-button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background: #6200ea; /* Purple color */
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.submit-button:hover {
+  background: #3700b3; /* Darker purple on hover */
+}
