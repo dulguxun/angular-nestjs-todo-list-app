@@ -1,7 +1,8 @@
 import { Controller, Get, Query, Post, Body, Req, UseGuards, UnauthorizedException, ForbiddenException, Param } from '@nestjs/common';
 import { TodoService } from './todo.service';
-import { Todotable } from './todo.entity';
+import { Todotablee } from './todo.entity';
 import { JwtAuthGuard } from 'src/strategies/jwt-auth.guard';
+
 
 @Controller('task')
 export class TodoController {
@@ -9,23 +10,23 @@ export class TodoController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getTasks(@Req() req, @Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<{ tasks: Todotable[], total: number }> {
+  async getTasks(@Req() req, @Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<{ tasks: Todotablee[], total: number }> {
     const userId = req.user.userId;
     return this.todoService.getTasksByUser(userId, page, limit);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('/add')
-  async addTask(@Req() req, @Body() taskData: { title: string, description: string }): Promise<{ message: string; tasks: Todotable[] }> {
+  async addTask(@Req() req, @Body() taskData: { title: string, description: string }): Promise<{ message: string; tasks: Todotablee[] }> {
     const userId = req.user.userId;
-    const newTask: Todotable = {
+    const newTask: Todotablee = {
       id: 0,
       title: taskData.title,
+      description: taskData.description,
       createdAt: new Date(),
       updatedAt: new Date(),
       favoriteTask: false,
-      originalPosition: 0,
-      description: taskData.description,
+      originalPosition: 0, // Add this field
       user: { id: userId } as any,
     };
     await this.todoService.addTask(newTask);
@@ -40,10 +41,6 @@ export class TodoController {
     const userId = req.user.userId;
     const task = await this.todoService.findTaskById(taskData.id);
 
-    if (task.user.id !== userId) {
-      throw new UnauthorizedException();
-    }
-
     task.title = taskData.title;
     task.description = taskData.description;
     task.updatedAt = new Date();
@@ -55,19 +52,15 @@ export class TodoController {
   @UseGuards(JwtAuthGuard)
   @Post('/delete')
   async deleteTask(@Req() req, @Body() taskId: { id: number }): Promise<{ message: string }> {
-    const userId = req.user.userId;
-    const task = await this.todoService.findTaskById(taskId.id);
-
-    if (task.user.id !== userId) {
-      throw new UnauthorizedException();
-    }
-
+    // const userId = req.user.userId;
+    // const task = await this.todoService.findTaskById(taskId.id);
     await this.todoService.deleteTask(taskId.id);
     return { message: 'Task deleted successfully' };
   }
+
   @UseGuards(JwtAuthGuard)
   @Get('/search')
-  async searchTasks(@Req() req, @Query('search') search: string, @Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<{ tasks: Todotable[], total: number }> {
+  async searchTasks(@Req() req, @Query('search') search: string, @Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<{ tasks: Todotablee[], total: number }> {
     const userId = req.user.userId;
     return this.todoService.searchTasksByTitle(userId, search, page, limit);
   }
@@ -82,13 +75,10 @@ export class TodoController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
-  async getTaskById(@Req() req, @Param('id') id: number): Promise<Todotable> {
+  async getTaskById(@Req() req, @Param('id') id: number): Promise<Todotablee> {
     const userId = req.user.userId;
     const task = await this.todoService.findTaskById(id);
-    console.log(task.user.id, userId);
-    if (task.user.id !== userId) {
-      
-      throw new ForbiddenException();
+    if (task.id !== userId) {
     }
     return task;
   }

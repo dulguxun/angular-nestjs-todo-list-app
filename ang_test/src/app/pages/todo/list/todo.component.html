@@ -1,21 +1,19 @@
 <div class="container">
   <!-- Combined Add Task and Search Card -->
-  <div class="card mb-3">
-    <div class="card-body text-center">
-      <button class="btn btn-primary add-task-button btn-block" [routerLink]="['/todo/add']">Add Task</button>
-    </div>
+  <div class="card">
+    <button class="btn btn-primary" type="button" [routerLink]="['/todo/add']">Add Task</button>
   </div>
   
   <!-- Search Task Input -->
   <div class="card mb-3 shrink-card">
     <div class="card-body">
       <div class="d-flex search-container justify-content-center">
-        <mat-form-field [formGroup]="form" class="flex-grow-1 search-input" appearance="fill">
-          <input formControlName="title" matInput placeholder="Search Tasks" [(ngModel)]="searchTerm" />
-          <button mat-icon-button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()">
-            <mat-icon>close</mat-icon>
+        <div [formGroup]="form">
+          <input class="form-control me-2" type="search" placeholder="Search Tasks" aria-label="Search" formControlName="title" [(ngModel)]="searchTerm">
+          <button class="btn btn-outline-success" type="submit" *ngIf="searchTerm" aria-label="Clear">
+            <span>&times;</span>
           </button>
-        </mat-form-field>
+        </div>
         <button class="btn btn-accent ml-2 search-button" (click)="searchTasks()">Search</button>
       </div>
     </div>
@@ -25,7 +23,7 @@
   <div class="row justify-content-center">
     <div class="col-sm-12 col-md-6 col-lg-4 mb-3" *ngFor="let task of tasks">
       <div class="card mat-card" [ngClass]="{'favorite-task': task.favoriteTask}">
-        <div class="card-body mat-card-content">
+        <div class="card-body">
           <div class="task-info" (click)="navigateToTaskDetail(task.id)">
             <h5 class="card-title task-title" [ngClass]="{'favorite': task.favoriteTask}">{{ task.title }}</h5>
             <p class="card-text task-description" [ngClass]="{'favorite': task.favoriteTask}">{{ task.description }}</p>
@@ -36,11 +34,13 @@
             </div>
           </div>
         </div>
+        
         <div class="card-footer d-flex justify-content-between task-actions">
           <button class="btn btn-link edit-button" (click)="navigateToEditTask(task)">Edit</button>
-          <button class="btn btn-link favorite-button" (click)="toggleFavorite(task)">
-            <mat-icon [ngClass]="{'favorite': task.favoriteTask, 'favorite_border': !task.favoriteTask }">{{ task.favoriteTask ? 'favorite' : 'favorite_border' }}</mat-icon>
-          </button>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" [checked]="task.favoriteTask" (change)="toggleFavorite(task)">
+            <!-- <label class="form-check-label">Favorite        </label> -->
+          </div>
         </div>
       </div>
     </div>
@@ -49,7 +49,23 @@
   <!-- Paginator with tooltips -->
   <div class="card mt-3">
     <div class="card-body">
-      <mat-paginator [length]="totalItems" [pageSize]="pageSize" (page)="onPageChange($event)"></mat-paginator>
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="currentPage === 0">
+            <a class="page-link" (click)="goToPage(currentPage - 1)" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item" *ngFor="let page of pagesArray; let i = index" [class.active]="currentPage === i">
+            <a class="page-link" (click)="goToPage(i)">{{ i + 1 }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+            <a class="page-link" (click)="goToPage(currentPage + 1)" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 </div>

@@ -1,19 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
-import { User } from './user.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly authService: AuthService) {}
 
-  async register(user: User): Promise<{ message: string; }> {
+  async register(user: User): Promise<{ message: string }> {
+    console.log("user", user);
     const existingUser = (await this.authService.getUsers()).find(u => u.email === user.email);
     if (existingUser) {
       throw new Error('User already exists');
     }
-    this.authService.addUser(user);
-    return { message: 'User registered successfully'};
+    
+    await this.authService.addUser(user);
+    return { message: 'User registered successfully' };
   }
-  
 }
+
 

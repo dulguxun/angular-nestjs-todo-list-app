@@ -1,20 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Todotable } from 'src/todo/todo.entity';
+import { Todotablee } from 'src/todo/todo.entity';
 
-@Entity()
-export class User {
-  @PrimaryGeneratedColumn()
+export interface User {
   id: number;
-
-  @Column({ length : 100 })
   username: string;
-
-  @Column({ length : 100 })
   email: string;
-
-  @Column({ length : 100 })
   password: string;
-
-  @OneToMany(() => Todotable, task => task.user)
-  tasks: Todotable[];
+  tasks: Todotablee[];
 }
