@@ -59,8 +59,9 @@ export class TodoFormComponent implements OnInit {
     const title = this.form.get('title')?.value;
     const description = this.form.get('description')?.value;
     const token = localStorage.getItem('token');
-
+  
     if (this.selectedTaskId !== null) {
+      // Update task
       this.todoFormService.updateTask(this.selectedTaskId, title, description, token).subscribe(
         () => {
           this.showToastMessage('Task updated successfully');
@@ -71,6 +72,7 @@ export class TodoFormComponent implements OnInit {
         }
       );
     } else {
+      // Add task
       this.todoFormService.addTask(title, description, token).subscribe(
         () => {
           this.showToastMessage('Task added successfully');
@@ -82,6 +84,7 @@ export class TodoFormComponent implements OnInit {
       );
     }
   }
+  
 
   showToastMessage(message: string): void {
     this.toastMessage = message;

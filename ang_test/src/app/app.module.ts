@@ -28,7 +28,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
     HttpClientModule,
     UserModule,
     TodoModule,
-    NgbModule
+    NgbModule,
+    
    ],
   providers: [
     provideAnimationsAsync()

@@ -4,6 +4,7 @@ import { Todotablee } from './todo.entity';
 import { JwtAuthGuard } from 'src/strategies/jwt-auth.guard';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { SearchTaskDto } from './dto/search-task.dto';
 
 @Controller('task')
 export class TodoController {
@@ -56,13 +57,23 @@ export class TodoController {
     await this.todoService.deleteTask(taskId.id);
     return { message: 'Task deleted successfully' };
   }
-
   @UseGuards(JwtAuthGuard)
   @Get('/search')
-  async searchTasks(@Req() req, @Query('search') search: string, @Query('page') page: number = 1, @Query('limit') limit: number = 10): Promise<{ tasks: Todotablee[], total: number }> {
+  async searchTasks(
+    @Req() req,
+    @Query() searchTaskDto: SearchTaskDto
+  ): Promise<{ tasks: Todotablee[], total: number }> {
     const userId = req.user.userId;
-    return this.todoService.searchTasksByTitle(userId, search, page, limit);
+    return this.todoService.searchTasksByTitle(
+      userId,
+      searchTaskDto.search || '',
+      searchTaskDto.startDate || null,
+      searchTaskDto.endDate || null,
+      searchTaskDto.page,
+      searchTaskDto.limit
+    );
   }
+
 
   @UseGuards(JwtAuthGuard)
   @Post('/favorite')
@@ -71,4 +82,13 @@ export class TodoController {
     await this.todoService.toggleFavoriteTaskById(userId, taskId.id);
     return { message: 'Task favorite status updated successfully' };
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getTaskById(@Req() req, @Param('id') id: number): Promise<Todotablee> {
+    const task = await this.todoService.findTaskById(id);
+    return task;
+  }
+
+  
 }

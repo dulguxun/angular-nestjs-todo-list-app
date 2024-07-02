@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { end } from '@popperjs/core';
 
 
 @Injectable({
@@ -23,25 +24,42 @@ export class TodoService {
     });
   }
 
-  searchTasks(token: string | null, searchTerm: string, page: number = 1, limit: number = 1000): Observable<any> {
-    // Log the parameters
-    console.log('Search Parameters:', {
-        search: searchTerm,
-        page: page.toString(),
-        limit: limit.toString(),
-      });
+  searchTasks(
+    token: string | null,
+    searchTerm: string,
+    startDate: string | null = null,
+    endDate: string | null = null,
+    page: number = 1,
+    limit: number = 3
+  ): Observable<any> {
+    console.log('service-n searchtasks:', {
+      search: searchTerm,
+      startDate: startDate,
+      endDate: endDate,
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    let params: any = {
+      search: searchTerm,
+      page: page.toString(),
+      limit: limit.toString(),
+    };
+
+    if (startDate) {
+      params.startDate = startDate;
+    }
+    if (endDate) {
+      params.endDate = endDate;
+    }
 
     return this.http.get(`${this.apiUrl}/search`, {
       headers: new HttpHeaders({
         Authorization: 'Bearer ' + token,
       }),
-      params: {
-        search: searchTerm,
-        page: page.toString(),
-        limit: limit.toString(),
-      },
+      params: params,
     });
-}
+  }
 
   addTask(title: string, token: string | null): Observable<any> {
     return this.http.post(

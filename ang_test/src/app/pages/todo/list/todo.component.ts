@@ -4,6 +4,7 @@ import { TodoService } from './todo.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 import { debounceTime } from 'rxjs/operators';
+import { start } from '@popperjs/core';
 
 interface Task {
   id: number;
@@ -26,6 +27,9 @@ export class TodoComponent implements OnInit {
   tasks: Task[] = [];
   selectedTask: Task | null = null;
   searchTerm: string = '';
+  startDate: string = '';
+  endDate: string = '';
+
   totalItems = 0;
   pageSize = 6;
   currentPage = 0;
@@ -41,29 +45,40 @@ export class TodoComponent implements OnInit {
     private snackBar: MatSnackBar,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) {
+    this.form = this.formBuilder.group({
+      startDate: [''],  // Initialize form controls
+      endDate: ['']
+    });
+  }
 
   ngOnInit(): void {
+    // this.searchTasks();
     this.form = this.formBuilder.group({
-      title: ''
+      title: '',   
+      startDate: '',  // Initialize form controls
+      endDate: ''   
     });
 
     this.route.queryParams.subscribe(params => {
       this.searchTerm = params['title'] || '';
+      this.startDate = params['startDate'] || '';
+      this.endDate = params['endDate'] || '';
       this.currentPage = +params['page'] - 1 || 0;
 
-      if (params['title'] || params['page']) {
+      if (params['title'] || params['page']
+      ) {
         this.searchTasks();
       } else {
         this.fetchTasks(this.currentPage + 1, this.pageSize);
       }
     });
 
-    this.form.get('title')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
-      this.searchTerm = this.form.get('title')?.value || '';
-      this.currentPage = 0;
-      this.searchTasks();
-    });
+    // this.form.get('title')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
+    //   this.searchTerm = this.form.get('title')?.value || '';
+    //   this.currentPage = 0;
+    //   this.searchTasks();
+    // });
   }
 
   updatePagination(): void {
@@ -78,6 +93,7 @@ export class TodoComponent implements OnInit {
         this.tasks = res.tasks;
         this.totalItems = res.total;
         this.updatePagination();
+        
       },
       (error: any) => {
         console.error('Error fetching tasks:', error);
@@ -87,19 +103,31 @@ export class TodoComponent implements OnInit {
 
   searchTasks(): void {
     const token = localStorage.getItem('token');
-    this.todoService.searchTasks(token, this.searchTerm, this.currentPage + 1, this.pageSize).subscribe(
+    // console.log("startDate", this.startDate);
+    console.log('controlleriin search tasks:', {
+      searchTerm: this.searchTerm,
+      startDate: this.startDate,
+      endDate: this.endDate,
+      page: this.currentPage + 1,
+      limit: this.pageSize,
+    });
+
+    this.todoService.searchTasks(token, this.searchTerm, this.startDate, this.endDate, this.currentPage + 1, this.pageSize).subscribe(
       (response: { tasks: Task[], total: number }) => {
         this.tasks = response.tasks;
         this.totalItems = response.total;
         this.updatePagination();
+        
 
         this.router.navigate([], {
           queryParams: {
             title: this.searchTerm,
+            startDate: this.startDate,
+            endDate: this.endDate,
             page: this.currentPage + 1,
           },
+          queryParamsHandling:'merge',
         });
-
       },
       (error: any) => {
         console.error('Error searching tasks:', error);
@@ -109,6 +137,8 @@ export class TodoComponent implements OnInit {
 
   clearSearch(): void {
     this.searchTerm = '';
+    this.startDate = '';
+    this.endDate = '';
     this.router.navigate([], {
       queryParams: {
         title: null,
@@ -130,6 +160,7 @@ export class TodoComponent implements OnInit {
       this.router.navigate([], {
         queryParams: {
           title: this.searchTerm,
+         
           page: this.currentPage + 1,
         },
         queryParamsHandling: 'merge',

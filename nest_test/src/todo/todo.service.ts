@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Todotablee } from './todo.entity';
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';
-import { throttleTime } from 'rxjs/operators';
+import { SearchTaskDto } from './dto/search-task.dto';
 
 dotenv.config();
 
@@ -54,8 +54,8 @@ export class TodoService {
     const client = await this.pool.connect();
     try {
       const query = `
-        INSERT INTO public.todotable (title, description, "createdAt", "updatedAt", "userId", "originalPosition")
-        VALUES ($1, $2, $3, $4, $5, (SELECT COUNT(*) FROM public.todotable WHERE "userId" = $5) + 1)
+        INSERT INTO public.todotable (title, description, "createdAt", "updatedAt", "userId")
+        VALUES ($1, $2, $3, $4, $5)
       `;
       const values = [task.title, task.description, task.createdAt, task.updatedAt, task.user.id];
       await client.query(query, values);
@@ -67,7 +67,7 @@ export class TodoService {
     }
   }
   
-
+//detail bolon update uyd
   async findTaskById(id: number): Promise<Todotablee> {
     const client = await this.pool.connect();
     try {
@@ -119,27 +119,55 @@ export class TodoService {
     }
   }
 
-  async searchTasksByTitle(userId: number, searchTerm: string, fromt, to, page: number = 1, limit: number = 10): Promise<{ tasks: Todotablee[], total: number }> {
+  async searchTasksByTitle(
+    userId: number,
+    searchTerm: string,
+    startDate: string | null,
+    endDate: string | null,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ tasks: Todotablee[], total: number }> {
     const client = await this.pool.connect();
     try {
       const offset = (page - 1) * limit;
-      const searchQuery = `
+      let searchQuery = `
         SELECT * FROM todotable
         WHERE "userId" = $1 AND title ILIKE $2
-        ORDER BY "updatedAt" DESC
-        LIMIT $3 OFFSET $4
       `;
-      const countQuery = `
+      let countQuery = `
         SELECT COUNT(*) FROM todotable
         WHERE "userId" = $1 AND title ILIKE $2
       `;
+      const searchParams = [userId, `%${searchTerm}%`];
+      const countParams = [userId, `%${searchTerm}%`];
       
-      const searchResult = await client.query(searchQuery, [userId, `%${searchTerm}%`, limit, offset]);
-      const countResult = await client.query(countQuery, [userId, `%${searchTerm}%`]);
-      
+      let paramIndex = 3;
+
+      if (startDate) {
+        searchQuery += ` AND "createdAt" >= $${paramIndex}`;
+        countQuery += ` AND "createdAt" >= $${paramIndex}`;
+        searchParams.push(startDate);
+        countParams.push(startDate);
+        paramIndex++;
+      }
+
+      if (endDate) {
+        searchQuery += ` AND "createdAt" <= $${paramIndex}`;
+        countQuery += ` AND "createdAt" <= $${paramIndex}`;
+        searchParams.push(endDate);
+        countParams.push(endDate);
+        paramIndex++;
+      }
+
+      searchQuery += ` ORDER BY "updatedAt" DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+      searchParams.push(limit, offset);
+
+      const searchResult = await client.query(searchQuery, searchParams);
+      const countResult = await client.query(countQuery, countParams);
+
       const tasks = searchResult.rows;
       const total = parseInt(countResult.rows[0].count, 10);
-      
+
       return { tasks, total };
     } catch (error) {
       console.error('Error executing query:', error);
@@ -148,14 +176,13 @@ export class TodoService {
       client.release();
     }
   }
-
   async toggleFavoriteTaskById(userId: number, taskId: number): Promise<void> {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
       
       const taskQuery = `
-        SELECT "favoriteTask", "originalPosition" FROM public.todotable
+        SELECT "favoriteTask" FROM public.todotable
         WHERE id = $1 AND "userId" = $2
       `;
       const taskResult = await client.query(taskQuery, [taskId, userId]);
@@ -164,28 +191,26 @@ export class TodoService {
         throw new Error('Task not found or you do not have permission to update this task');
       }
   
-      const task = taskResult.rows[0];
-      const newFavoriteStatus = !task.favoriteTask;
-      
+      const { favoriteTask } = taskResult.rows[0];
+      const newFavoriteStatus = !favoriteTask;
+  
       let updateQuery;
       let values;
       
       if (newFavoriteStatus) {
         updateQuery = `
           UPDATE public.todotable
-          SET "favoriteTask" = $1, "originalPosition" = $2
-          WHERE id = $3 AND "userId" = $4
+          SET "favoriteTask" = $1, "updatedAt" = NOW()
+          WHERE id = $2 AND "userId" = $3
         `;
-        values = [newFavoriteStatus, task.originalPosition, taskId, userId];
+        values = [newFavoriteStatus, taskId, userId];
       } else {
         updateQuery = `
           UPDATE public.todotable
-          SET "favoriteTask" = $1, "originalPosition" = (
-            SELECT COUNT(*) FROM public.todotable WHERE "userId" = $2 AND "favoriteTask" = true
-          ) + 1
-          WHERE id = $3 AND "userId" = $4
+          SET "favoriteTask" = $1, "updatedAt" = NOW(), "createdAt" = NOW()
+          WHERE id = $2 AND "userId" = $3
         `;
-        values = [newFavoriteStatus, userId, taskId, userId];
+        values = [newFavoriteStatus, taskId, userId];
       }
   
       await client.query(updateQuery, values);
@@ -198,4 +223,5 @@ export class TodoService {
       client.release();
     }
   }
+    
 }  
