@@ -12,6 +12,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class TodoFormComponent implements OnInit {
   form!: FormGroup;
   selectedTaskId: number | null = null;
+  showToast: boolean = false;
+  toastMessage: string = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -61,7 +63,7 @@ export class TodoFormComponent implements OnInit {
     if (this.selectedTaskId !== null) {
       this.todoFormService.updateTask(this.selectedTaskId, title, description, token).subscribe(
         () => {
-          this.openSnackBar('Task updated successfully');
+          this.showToastMessage('Task updated successfully');
           this.router.navigate(['/todo']);
         },
         error => {
@@ -71,7 +73,7 @@ export class TodoFormComponent implements OnInit {
     } else {
       this.todoFormService.addTask(title, description, token).subscribe(
         () => {
-          this.openSnackBar('Task added successfully');
+          this.showToastMessage('Task added successfully');
           this.router.navigate(['/todo']);
         },
         error => {
@@ -81,9 +83,11 @@ export class TodoFormComponent implements OnInit {
     }
   }
 
-  openSnackBar(message: string): void {
-    this.snackBar.open(message, 'Close', {
-      duration: 3000,
-    });
+  showToastMessage(message: string): void {
+    this.toastMessage = message;
+    this.showToast = true;
+    setTimeout(() => {
+      this.showToast = false;
+    }, 3000); // Hide toast after 3 seconds
   }
 }

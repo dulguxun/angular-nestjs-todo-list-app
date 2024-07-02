@@ -3,7 +3,7 @@
   <div class="card">
     <button class="btn btn-primary" type="button" [routerLink]="['/todo/add']">Add Task</button>
   </div>
-  
+
   <!-- Search Task Input -->
   <div class="card mb-3 shrink-card">
     <div class="card-body">
@@ -14,14 +14,14 @@
             <span>&times;</span>
           </button>
         </div>
-        <button class="btn btn-accent ml-2 search-button" (click)="searchTasks()">Search</button>
+        <button class="btn btn-outline-primary" (click)="searchTasks()">Search</button>
       </div>
     </div>
   </div>
 
   <!-- Task Grid List -->
-  <div class="row justify-content-center">
-    <div class="col-sm-12 col-md-6 col-lg-4 mb-3" *ngFor="let task of tasks">
+  <div class="row">
+    <div class="col-md-6 col-lg-4 mb-3" *ngFor="let task of tasks; let i = index">
       <div class="card mat-card" [ngClass]="{'favorite-task': task.favoriteTask}">
         <div class="card-body">
           <div class="task-info" (click)="navigateToTaskDetail(task.id)">
@@ -36,10 +36,9 @@
         </div>
         
         <div class="card-footer d-flex justify-content-between task-actions">
-          <button class="btn btn-link edit-button" (click)="navigateToEditTask(task)">Edit</button>
+          <button class="btn btn-primary" type="button" (click)="navigateToEditTask(task)">Edit</button>
           <div class="form-check">
             <input class="form-check-input" type="checkbox" [checked]="task.favoriteTask" (change)="toggleFavorite(task)">
-            <!-- <label class="form-check-label">Favorite        </label> -->
           </div>
         </div>
       </div>
@@ -66,6 +65,15 @@
           </li>
         </ul>
       </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap Toast for Notifications -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div *ngIf="showToast" class="toast align-items-center" [class.show]="showToast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-body">
+      {{ toastMessage }}
     </div>
   </div>
 </div>

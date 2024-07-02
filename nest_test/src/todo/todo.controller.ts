@@ -1,8 +1,9 @@
-import { Controller, Get, Query, Post, Body, Req, UseGuards, UnauthorizedException, ForbiddenException, Param } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body, Req, UseGuards, Param } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { Todotablee } from './todo.entity';
 import { JwtAuthGuard } from 'src/strategies/jwt-auth.guard';
-
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Controller('task')
 export class TodoController {
@@ -17,16 +18,16 @@ export class TodoController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/add')
-  async addTask(@Req() req, @Body() taskData: { title: string, description: string }): Promise<{ message: string; tasks: Todotablee[] }> {
+  async addTask(@Req() req, @Body() taskData: CreateTaskDto): Promise<{ message: string; tasks: Todotablee[] }> {
     const userId = req.user.userId;
     const newTask: Todotablee = {
       id: 0,
       title: taskData.title,
-      description: taskData.description,
+      description: taskData.description || '',
       createdAt: new Date(),
       updatedAt: new Date(),
       favoriteTask: false,
-      originalPosition: 0, // Add this field
+      originalPosition: 0,
       user: { id: userId } as any,
     };
     await this.todoService.addTask(newTask);
@@ -37,7 +38,7 @@ export class TodoController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/update')
-  async updateTask(@Req() req, @Body() taskData: { id: number; title: string, description: string }): Promise<{ message: string }> {
+  async updateTask(@Req() req, @Body() taskData: UpdateTaskDto): Promise<{ message: string }> {
     const userId = req.user.userId;
     const task = await this.todoService.findTaskById(taskData.id);
 
@@ -46,14 +47,12 @@ export class TodoController {
     task.updatedAt = new Date();
 
     await this.todoService.updateTask(task);
-    return { message: 'Task updated successfully'};
+    return { message: 'Task updated successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('/delete')
   async deleteTask(@Req() req, @Body() taskId: { id: number }): Promise<{ message: string }> {
-    // const userId = req.user.userId;
-    // const task = await this.todoService.findTaskById(taskId.id);
     await this.todoService.deleteTask(taskId.id);
     return { message: 'Task deleted successfully' };
   }
@@ -67,19 +66,9 @@ export class TodoController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/favorite')
-  async favoriteTask(@Req() req, @Body() taskId: { id: number }): Promise<{ message: string }> {
+  async toggleFavoriteTask(@Req() req, @Body() taskId: { id: number }): Promise<{ message: string }> {
     const userId = req.user.userId;
     await this.todoService.toggleFavoriteTaskById(userId, taskId.id);
     return { message: 'Task favorite status updated successfully' };
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('/:id')
-  async getTaskById(@Req() req, @Param('id') id: number): Promise<Todotablee> {
-    const userId = req.user.userId;
-    const task = await this.todoService.findTaskById(id);
-    if (task.id !== userId) {
-    }
-    return task;
   }
 }

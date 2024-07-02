@@ -1,22 +1,42 @@
-<div class="container">
+<div *ngIf="task" class="container">
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <!-- Task Details -->
       <div *ngIf="task" class="card mb-3">
         <div class="card-body">
-          <h2>Task Details</h2>
-          <p><strong>Title:</strong> {{ task.title }}</p>
-          <p><strong>Description:</strong> {{ task.description }}</p>
-          <p><strong>Created At:</strong> {{ task.createdAt | luxonDate: dateFormat }}</p>
-          <p><strong>Updated At:</strong> {{ task.updatedAt | luxonDate: dateFormat }}</p>
-          <div class="text-center"> <!-- Centered delete button -->
-            <button mat-button (click)="deleteTask(task.id)" class="btn btn-danger delete-button">Delete</button>
+          <h2 class="card-title mb-4 pb-3 border-bottom">Task Details</h2>
+          <div class="mb-3">
+            <h4 class="text-primary">Title:</h4>
+            <p class="lead">{{ task.title }}</p>
+          </div>
+          <div class="mb-3">
+            <h4 class="text-primary">Description:</h4>
+            <p>{{ task.description }}</p>
+          </div>
+          <div class="mb-3">
+            <h4 class="text-primary">Created At:</h4>
+            <p>{{ task.createdAt | luxonDate: dateFormat }}</p>
+          </div>
+          <div class="mb-3">
+            <h4 class="text-primary">Updated At:</h4>
+            <p>{{ task.updatedAt | luxonDate: dateFormat }}</p>
+          </div>
+          <div class="text-center mt-3"> <!-- Centered delete button -->
+            <button type="button" class="btn btn-primary mr-2" (click)="navigateToEditTask(task)">Edit</button>
+            <button type="button" class="btn btn-warning" (click)="deleteTask(task.id)">Delete</button>
           </div>
         </div>
       </div>
-
-      <!-- No Task Found Message -->
-      <h1 *ngIf="!task" class="text-center mt-3">No task found.</h1>
+    </div>
+    <!-- No Task Found Message -->
+    <h1 *ngIf="!task" class="text-center mt-3">No task found.</h1>
+  </div>
+</div>
+<!-- Bootstrap Toast for Notifications -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div *ngIf="showToast" class="toast align-items-center" [class.show]="showToast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-body">
+      {{ toastMessage }}
     </div>
   </div>
 </div>

@@ -16,17 +16,3 @@ p strong {
   font-weight: bold;
 }
 
-.delete-button {
-  background-color: #dc3545; /* Bootstrap danger color */
-  color: #fff; /* White text */
-  border: none;
-  border-radius: 8px;
-  padding: 10px 15px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.delete-button:hover {
-  background-color: #c82333; /* Darker red on hover */
-}

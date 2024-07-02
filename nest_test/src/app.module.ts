@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_PIPE } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
 import { TodoModule } from './todo/todo.module';
-import { Todotablee } from './todo/todo.entity';
-import { User } from './users/user.entity';
+import { UsersModule } from './users/users.module';
+import { ValidationPipe } from '@nestjs/common';
 
 @Module({
-  imports: [
-    AuthModule,
-    UsersModule,
-    TodoModule,
-  ],
+  imports: [AuthModule, TodoModule, UsersModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+  ],
 })
 export class AppModule {}

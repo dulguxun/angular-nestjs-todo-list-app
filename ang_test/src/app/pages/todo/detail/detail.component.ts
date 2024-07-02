@@ -23,6 +23,8 @@ export class DetailComponent implements OnInit {
   taskId!: number;
   task!: Task;
   dateFormat: string = 'yyyy LLL dd, HH:mm ';
+  showToast: boolean = false;
+  toastMessage: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -53,7 +55,7 @@ export class DetailComponent implements OnInit {
 
   deleteTask(id: number): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '350px'
+      // width: '350px'
     }); // Open the dialog
 
     dialogRef.afterClosed().subscribe(result => {
@@ -61,9 +63,7 @@ export class DetailComponent implements OnInit {
         const token = localStorage.getItem('token');
         this.todoService.deleteTask(id, token).subscribe(
           () => {
-            this.snackBar.open('Task deleted successfully', 'Close', {
-              duration: 3000,
-            });
+            this.showToastMessage('Task deleted successfully');
             this.router.navigate(['/todo']);
           },
           (error: any) => {
@@ -74,7 +74,20 @@ export class DetailComponent implements OnInit {
     });
   }
 
+  navigateToEditTask(task: Task): void {
+    this.router.navigate(['/todo/edit', this.taskId]);
+  }
+
   toggleDateFormat(): void {
     this.dateFormat = this.dateFormat.includes('HH') ? 'yyyy LLL dd, hh:mm a' : 'yyyy LLL dd, HH:mm';
   }
+
+  showToastMessage(message: string): void {
+    this.toastMessage = message;
+    this.showToast = true;
+    setTimeout(() => {
+      this.showToast = false;
+    }, 3000); // Hide toast after 3 seconds
+  }
+
 }

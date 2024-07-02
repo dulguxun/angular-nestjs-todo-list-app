@@ -91,13 +91,6 @@ export class TodoService {
     );
   }
 
-  // getTaskById(id: number, token: string | null): Observable<any> {
-  //   return this.http.get(`${this.apiUrl}/${id}`, {
-  //     headers: new HttpHeaders({
-  //       Authorization: 'Bearer'+ token,
-  //     }),
-  //   });
-  // }
   getTaskById(id: number, token: string | null): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     console.log('Requesting task ID:', id, 'with headers:', headers);

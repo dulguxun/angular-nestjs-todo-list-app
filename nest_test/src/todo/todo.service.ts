@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Todotablee } from './todo.entity';
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';
+import { throttleTime } from 'rxjs/operators';
 
 dotenv.config();
 
@@ -118,7 +119,7 @@ export class TodoService {
     }
   }
 
-  async searchTasksByTitle(userId: number, searchTerm: string, page: number = 1, limit: number = 10): Promise<{ tasks: Todotablee[], total: number }> {
+  async searchTasksByTitle(userId: number, searchTerm: string, fromt, to, page: number = 1, limit: number = 10): Promise<{ tasks: Todotablee[], total: number }> {
     const client = await this.pool.connect();
     try {
       const offset = (page - 1) * limit;
@@ -148,22 +149,6 @@ export class TodoService {
     }
   }
 
-  async togglefavorites(userId: string, taskId: number): Promise<void> {
-    const client = await this.pool.connect();
-    try {
-      const query = `
-        UPDATE public.todotable
-        SET "favoriteTask" = NOT "favoriteTask"
-        WHERE id = $1 AND "userId" = $2
-      `;
-      await client.query(query, [taskId, userId]);
-    } catch (error) {
-      console.error('Error executing query:', error);
-      throw new Error('Could not toggle favorite status');
-    } finally {
-      client.release();
-    }
-  }
   async toggleFavoriteTaskById(userId: number, taskId: number): Promise<void> {
     const client = await this.pool.connect();
     try {
@@ -214,28 +199,3 @@ export class TodoService {
     }
   }
 }  
-
-
-
-//   async toggleFavoriteTaskById(userId: number, taskId: number): Promise<void> {
-//     const client = await this.pool.connect();
-//     try {
-//       const query = `
-//         UPDATE public.todotable
-//         SET "favoriteTask" = NOT "favoriteTask"
-//         WHERE id = $1 AND "userId" = $2
-//       `;
-//       const values = [taskId, userId];
-//       const result = await client.query(query, values);
-  
-//       if (result.rowCount === 0) {
-//         throw new Error('Task not found or you do not have permission to update this task');
-//       }
-//     } catch (error) {
-//       console.error('Error toggling favorite task:', error);
-//       throw new Error('Could not toggle favorite task');
-//     } finally {
-//       client.release();
-//     }
-//   }  
-// }

@@ -10,48 +10,6 @@ body {
   margin: 0 auto;
 }
 
-/* Add Task Card */
-.add-task-button {
-  background-color: #4caf50; /* Green */
-  color: #fff; /* White text */
-  border: none;
-  border-radius: 8px;
-  padding: 5px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.add-task-button:hover {
-  background-color: #45a049; /* Darker green on hover */
-}
-
-/* Search Task Input */
-/* .search-container {
-  display: flex;
-  align-items: center;
-}
-
-.search-input {
-  margin-right: 10px;
-} */
-
-.search-button {
-  background-color: #ff4081; /* Pink */
-  color: #fff; /* White text */
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.search-button:hover {
-  background-color: #f50057; /* Darker pink on hover */
-}
-.card{
-  --bs-card-spacer-y: 0.2rem;
-}
-
 /* Task Cards */
 .mat-card {
   border: 1px solid #e0e0e0;
@@ -93,51 +51,8 @@ body {
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
 }
-
-.edit-button,
-.favorite-button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.edit-button:hover,
-.favorite-button:hover {
-  color: pink; /* Green */
-}
-
-.favorite-button {
-  margin-left: 10px;
-}
-
-.favorite-button mat-icon {
-  font-size: 24px;
-}
-
 .favorite {
   color: #ff4081; /* Pink */
-}
-
-/* Paginator with tooltips */
-.mat-paginator {
-  justify-content: center;
-}
-
-.mat-paginator-navigation-button {
-  position: relative;
-}
-
-.mat-paginator-tooltip {
-  position: absolute;
-  top: -30px; /* Adjust as needed to position tooltip above the button */
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 14px;
 }
 
 /* Responsive Adjustments */

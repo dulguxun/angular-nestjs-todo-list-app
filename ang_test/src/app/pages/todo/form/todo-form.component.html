@@ -1,18 +1,29 @@
-<div class="form-container">
-  <form [formGroup]="form" (ngSubmit)="submitTodo()">
-    <div class="form-column">
-      <mat-form-field>
-        <input matInput placeholder="Task Title" formControlName="title" class="mat-input-element">
-        <mat-error *ngIf="form.get('title')?.hasError('required')">
-          Title is required
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Task Description" formControlName="description" class="mat-input-element">
-      </mat-form-field>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="card-title mb-4 pb-3 border-bottom">Task Form</h2>
+          <form [formGroup]="form" (ngSubmit)="submitTodo()">
+            <div class="form-group">
+              <label for="title" class="text-primary">Task Title</label>
+              <input type="text" id="title" class="form-control" formControlName="title" placeholder="Enter Task Title">
+              <div *ngIf="form.get('title')?.errors?.['required'] && (form.get('title')?.dirty || form.get('title')?.touched)" class="text-danger">
+                <small *ngIf="form.get('title')?.errors?.['required']">Title is required</small>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="description" class="text-primary">Task Description</label>
+              <textarea id="description" class="form-control" formControlName="description" rows="4" placeholder="Enter Task Description"></textarea>
+            </div>
+            <div class="text-center">
+              <button class="btn btn-primary submit-button" type="submit" [disabled]="form.invalid">
+                {{ selectedTaskId ? 'Update Task' : 'Add Task' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <button class="submit-button" mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-      {{ selectedTaskId ? 'Update Task' : 'Add Task' }}
-    </button>
-  </form>
+  </div>
 </div>
