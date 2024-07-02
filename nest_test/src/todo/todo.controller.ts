@@ -35,11 +35,11 @@ export class TodoController {
       createdAt: new Date(),
       updatedAt: new Date(),
       favoriteTask: false,
-      originalPosition: 0,
+  
       user: { id: userId } as any,
     };
     await this.todoService.addTask(newTask);
-
+  
     const { tasks } = await this.todoService.getTasksByUser(userId);
     return { message: 'Task added successfully', tasks };
   }

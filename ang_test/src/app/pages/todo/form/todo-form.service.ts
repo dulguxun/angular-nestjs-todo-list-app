@@ -22,16 +22,15 @@ export class TodoFormService {
     });
   }
 
-  addTask(title: string, description: string, token: string | null): Observable<any> {
-    return this.http.post(
-      `${this.apiUrl}/add`,
-      { title, description },
-      {
-        headers: new HttpHeaders({
-          Authorization: 'Bearer ' + token,
-        }),
-      }
-    );
+ addTask(title: string, description: string, token: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    const body = { title, description };
+
+    return this.http.post(`${this.apiUrl}/add`, body, { headers });
   }
 
   updateTask(id: number, title: string, description: string, token: string | null): Observable<any> {

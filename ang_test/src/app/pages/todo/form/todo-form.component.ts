@@ -59,6 +59,11 @@ export class TodoFormComponent implements OnInit {
     const title = this.form.get('title')?.value;
     const description = this.form.get('description')?.value;
     const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.error('No token found');
+      return; // Or handle this case as needed
+    }
   
     if (this.selectedTaskId !== null) {
       // Update task

@@ -67,6 +67,7 @@ export class TodoService {
     }
   }
   
+  
 //detail bolon update uyd
   async findTaskById(id: number): Promise<Todotablee> {
     const client = await this.pool.connect();
