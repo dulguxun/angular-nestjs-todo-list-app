@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { end } from '@popperjs/core';
 
@@ -30,7 +30,7 @@ export class TodoService {
     startDate: string | null = null,
     endDate: string | null = null,
     page: number = 1,
-    limit: number = 3
+    limit: number = 6
   ): Observable<any> {
     console.log('service-n searchtasks:', {
       search: searchTerm,
@@ -40,17 +40,22 @@ export class TodoService {
       limit: limit.toString(),
     });
 
-    let params: any = {
-      search: searchTerm,
-      page: page.toString(),
-      limit: limit.toString(),
-    };
+    let params = new HttpParams()
+
+    if (searchTerm) {
+      params = params.set('search', searchTerm);
+    }
+
+    if(page.toString) (
+      params = params.set('page', page.toString())
+    )
 
     if (startDate) {
-      params.startDate = startDate;
+      params = params.set('startDate', startDate);
     }
+
     if (endDate) {
-      params.endDate = endDate;
+      params = params.set('endDate', endDate);
     }
 
     return this.http.get(`${this.apiUrl}/search`, {

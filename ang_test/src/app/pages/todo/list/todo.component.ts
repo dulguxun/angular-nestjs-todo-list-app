@@ -17,6 +17,14 @@ interface Task {
   originalPosition: number; // Add this field
 }
 
+interface SearchFilter {
+  searchTerm: string;
+  startDate: string;
+  endDate: string;
+  page: number;
+  limit: number;
+}
+
 @Component({
   selector: 'app-todo',
   templateUrl: './todo.component.html',
@@ -38,7 +46,7 @@ export class TodoComponent implements OnInit {
   pagesArray: number[] = [];
   showToast: boolean = false;
   toastMessage: string = '';
-
+  
   constructor(
     private formBuilder: FormBuilder,
     private todoService: TodoService,
@@ -51,7 +59,7 @@ export class TodoComponent implements OnInit {
       endDate: ['']
     });
   }
-
+  
   ngOnInit(): void {
     // this.searchTasks();
     this.form = this.formBuilder.group({
@@ -59,13 +67,13 @@ export class TodoComponent implements OnInit {
       startDate: '',  // Initialize form controls
       endDate: ''   
     });
-
+    
     this.route.queryParams.subscribe(params => {
       this.searchTerm = params['title'] || '';
       this.startDate = params['startDate'] || '';
       this.endDate = params['endDate'] || '';
       this.currentPage = +params['page'] - 1 || 0;
-
+      
       if (params['title'] || params['page']
       ) {
         this.searchTasks();
@@ -73,19 +81,19 @@ export class TodoComponent implements OnInit {
         this.fetchTasks(this.currentPage + 1, this.pageSize);
       }
     });
-
-    // this.form.get('title')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
-    //   this.searchTerm = this.form.get('title')?.value || '';
-    //   this.currentPage = 0;
-    //   this.searchTasks();
-    // });
+    
+    this.form.get('title')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
+      this.searchTerm = this.form.get('title')?.value || '';
+      this.currentPage = 0;
+      this.searchTasks();
+    });
   }
 
   updatePagination(): void {
     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
     this.pagesArray = Array(this.totalPages).fill(0).map((x, i) => i);
   }
-
+  
   fetchTasks(page: number, pageSize: number): void {
     const token = localStorage.getItem('token');
     this.todoService.fetchTasks(token, page, pageSize).subscribe(
@@ -100,41 +108,43 @@ export class TodoComponent implements OnInit {
       }
     );
   }
-
+  
   searchTasks(): void {
     const token = localStorage.getItem('token');
-    // console.log("startDate", this.startDate);
-    console.log('controlleriin search tasks:', {
+    const filter: SearchFilter = {
       searchTerm: this.searchTerm,
       startDate: this.startDate,
       endDate: this.endDate,
       page: this.currentPage + 1,
       limit: this.pageSize,
-    });
-
-    this.todoService.searchTasks(token, this.searchTerm, this.startDate, this.endDate, this.currentPage + 1, this.pageSize).subscribe(
+    };
+    
+    console.log('Controller in search tasks:', filter);
+    
+    this.todoService.searchTasks(token, filter.searchTerm).subscribe(
       (response: { tasks: Task[], total: number }) => {
         this.tasks = response.tasks;
         this.totalItems = response.total;
         this.updatePagination();
         
-
+        const queryParams = {
+          title: filter.searchTerm,
+          startDate: filter.startDate,
+          endDate: filter.endDate,
+          page: filter.page,
+          limit: filter.limit,
+        };
+  
         this.router.navigate([], {
-          queryParams: {
-            title: this.searchTerm,
-            startDate: this.startDate,
-            endDate: this.endDate,
-            page: this.currentPage + 1,
-          },
-          queryParamsHandling:'merge',
+          queryParams,
+          queryParamsHandling: 'merge',
         });
       },
       (error: any) => {
         console.error('Error searching tasks:', error);
       }
     );
-  }
-
+  }  
   clearSearch(): void {
     this.searchTerm = '';
     this.startDate = '';
