@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { TodoService, SearchFilter } from './todo.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
-import { debounceTime } from 'rxjs/operators';
 
 interface Task {
   id: number;
@@ -30,7 +29,7 @@ export class TodoComponent implements OnInit {
   endDate: string = '';
   totalItems = 0;
   pageSize = 6;
-  currentPage = 0; // Initialize currentPage to 0
+  currentPage = 0;
   dateFormat: string = 'yyyy LLL dd, HH:mm ';
   totalPages: number = 0;
   pagesArray: number[] = [];
@@ -57,32 +56,20 @@ export class TodoComponent implements OnInit {
       this.searchTerm = params['title'] || '';
       this.startDate = params['startDate'] || '';
       this.endDate = params['endDate'] || '';
-      this.currentPage = +params['page'] - 1 || 0; // Set currentPage from queryParams
+      this.currentPage = +params['page'] - 1 || 0;
 
-      // this.form.get('title')?.setValue(this.searchTerm);
-      // this.form.get('startDate')?.setValue(this.startDate);
-      // this.form.get('endDate')?.setValue(this.endDate);
+      this.form.patchValue({
+        title: this.searchTerm,
+        startDate: this.startDate,
+        endDate: this.endDate
+      });
 
       if (params['title'] || params['startDate'] || params['endDate'] || params['page']) {
-        this.searchTasks();
+        console.log('if params ajillaa');
+        this.searchTasks(false);
       } else {
-        this.fetchTasks(this.currentPage + 1, this.pageSize); // Fetch tasks with currentPage
+        this.fetchTasks(this.currentPage + 1, this.pageSize);
       }
-    });
-
-    this.form.get('title')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
-      this.searchTerm = this.form.get('title')?.value || '';
-      this.searchTasks();
-    });
-
-    this.form.get('startDate')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
-      this.startDate = this.form.get('startDate')?.value || '';
-      this.searchTasks();
-    });
-
-    this.form.get('endDate')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
-      this.endDate = this.form.get('endDate')?.value || '';
-      this.searchTasks();
     });
   }
 
@@ -106,20 +93,26 @@ export class TodoComponent implements OnInit {
     );
   }
 
-  searchTasks(): void {
+  searchTasks(resetPage: boolean = true): void {
+    this.searchTerm = this.form.get('title')?.value || '';
+    this.startDate = this.form.get('startDate')?.value || '';
+    this.endDate = this.form.get('endDate')?.value || '';
+
+    if (resetPage) {
+      this.currentPage = 0;
+    }
+
     const token = localStorage.getItem('token');
     const filter: SearchFilter = {
       searchTerm: this.searchTerm,
       startDate: this.startDate,
       endDate: this.endDate,
-      page: this.currentPage + 1, // Use currentPage + 1 in the filter
+      page: this.currentPage + 1,
       limit: this.pageSize,
     };
 
     this.todoService.searchTasks(token, filter).subscribe(
-      
       (response: { tasks: Task[], total: number }) => {
-        console.log(response);
         this.tasks = response.tasks;
         this.totalItems = response.total;
         this.updatePagination();
@@ -156,8 +149,8 @@ export class TodoComponent implements OnInit {
       },
       queryParamsHandling: 'merge',
     }).then(() => {
-      this.currentPage = 0; // Reset currentPage to 0 when clearing search
-      this.fetchTasks(1, this.pageSize); // Fetch tasks for the first page
+      this.currentPage = 0;
+      this.fetchTasks(1, this.pageSize);
     });
   }
 
@@ -168,7 +161,7 @@ export class TodoComponent implements OnInit {
     this.currentPage = page;
 
     const queryParams: any = {
-      page: this.currentPage + 1, // Adjust currentPage for navigation
+      page: this.currentPage + 1,
     };
 
     if (this.searchTerm) {
@@ -187,11 +180,7 @@ export class TodoComponent implements OnInit {
       queryParams,
       queryParamsHandling: 'merge',
     }).then(() => {
-      if (this.searchTerm || this.startDate || this.endDate) {
-        this.searchTasks();
-      } else {
-        this.fetchTasks(this.currentPage + 1, this.pageSize); // Fetch tasks for currentPage
-      }
+      this.fetchTasks(this.currentPage + 1, this.pageSize);
     });
   }
 
