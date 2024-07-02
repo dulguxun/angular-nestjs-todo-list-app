@@ -37,7 +37,6 @@ export class TodoComponent implements OnInit {
   searchTerm: string = '';
   startDate: string = '';
   endDate: string = '';
-
   totalItems = 0;
   pageSize = 6;
   currentPage = 0;
@@ -113,15 +112,13 @@ export class TodoComponent implements OnInit {
     const token = localStorage.getItem('token');
     const filter: SearchFilter = {
       searchTerm: this.searchTerm,
-      startDate: this.startDate,
-      endDate: this.endDate,
+      startDate: this.form.get('startDate')?.value,
+      endDate: this.form.get('endDate')?.value,
       page: this.currentPage + 1,
       limit: this.pageSize,
     };
-    
-    console.log('Controller in search tasks:', filter);
-    
-    this.todoService.searchTasks(token, filter.searchTerm).subscribe(
+  
+    this.todoService.searchTasks(token, filter.searchTerm, filter.startDate, filter.endDate, filter.page, filter.limit).subscribe(
       (response: { tasks: Task[], total: number }) => {
         this.tasks = response.tasks;
         this.totalItems = response.total;
@@ -144,7 +141,8 @@ export class TodoComponent implements OnInit {
         console.error('Error searching tasks:', error);
       }
     );
-  }  
+  }
+    
   clearSearch(): void {
     this.searchTerm = '';
     this.startDate = '';
