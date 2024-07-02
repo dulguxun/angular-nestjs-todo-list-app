@@ -16,8 +16,6 @@ interface Task {
   originalPosition: number;
 }
 
-
-
 @Component({
   selector: 'app-todo',
   templateUrl: './todo.component.html',
@@ -32,13 +30,13 @@ export class TodoComponent implements OnInit {
   endDate: string = '';
   totalItems = 0;
   pageSize = 6;
-  currentPage = 0;
+  currentPage = 0; // Initialize currentPage to 0
   dateFormat: string = 'yyyy LLL dd, HH:mm ';
   totalPages: number = 0;
   pagesArray: number[] = [];
   showToast: boolean = false;
   toastMessage: string = '';
-  
+
   constructor(
     private formBuilder: FormBuilder,
     private todoService: TodoService,
@@ -47,50 +45,43 @@ export class TodoComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     this.form = this.formBuilder.group({
-      startDate: [''],
-      endDate: ['']
-    });
-  }
-  
-  ngOnInit(): void {
-    this.form = this.formBuilder.group({
       title: '',
       startDate: '',
       endDate: ''
     });
+  }
 
+  ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
+      console.log(params);
       this.searchTerm = params['title'] || '';
       this.startDate = params['startDate'] || '';
       this.endDate = params['endDate'] || '';
-      this.currentPage = +params['page'] - 1 || 0;
+      this.currentPage = +params['page'] - 1 || 0; // Set currentPage from queryParams
 
-      this.form.get('title')?.setValue(this.searchTerm);
-      this.form.get('startDate')?.setValue(this.startDate);
-      this.form.get('endDate')?.setValue(this.endDate);
+      // this.form.get('title')?.setValue(this.searchTerm);
+      // this.form.get('startDate')?.setValue(this.startDate);
+      // this.form.get('endDate')?.setValue(this.endDate);
 
       if (params['title'] || params['startDate'] || params['endDate'] || params['page']) {
         this.searchTasks();
       } else {
-        this.fetchTasks(this.currentPage + 1, this.pageSize);
+        this.fetchTasks(this.currentPage + 1, this.pageSize); // Fetch tasks with currentPage
       }
     });
 
     this.form.get('title')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
       this.searchTerm = this.form.get('title')?.value || '';
-      this.currentPage = 0;
       this.searchTasks();
     });
 
     this.form.get('startDate')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
       this.startDate = this.form.get('startDate')?.value || '';
-      this.currentPage = 0;
       this.searchTasks();
     });
 
     this.form.get('endDate')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
       this.endDate = this.form.get('endDate')?.value || '';
-      this.currentPage = 0;
       this.searchTasks();
     });
   }
@@ -99,10 +90,9 @@ export class TodoComponent implements OnInit {
     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
     this.pagesArray = Array(this.totalPages).fill(0).map((x, i) => i);
   }
-  
+
   fetchTasks(page: number, pageSize: number): void {
     console.log('Fetching tasks for page:', page);
-    
     const token = localStorage.getItem('token');
     this.todoService.fetchTasks(token, page, pageSize).subscribe(
       (res: any) => {
@@ -115,23 +105,25 @@ export class TodoComponent implements OnInit {
       }
     );
   }
-  
+
   searchTasks(): void {
     const token = localStorage.getItem('token');
     const filter: SearchFilter = {
       searchTerm: this.searchTerm,
       startDate: this.startDate,
       endDate: this.endDate,
-      page: this.currentPage + 1,
+      page: this.currentPage + 1, // Use currentPage + 1 in the filter
       limit: this.pageSize,
     };
-  
+
     this.todoService.searchTasks(token, filter).subscribe(
+      
       (response: { tasks: Task[], total: number }) => {
+        console.log(response);
         this.tasks = response.tasks;
         this.totalItems = response.total;
         this.updatePagination();
-  
+
         const queryParams = {
           title: filter.searchTerm,
           startDate: filter.startDate,
@@ -139,7 +131,7 @@ export class TodoComponent implements OnInit {
           page: filter.page,
           limit: filter.limit,
         };
-  
+
         this.router.navigate([], {
           queryParams,
           queryParamsHandling: 'merge',
@@ -164,7 +156,8 @@ export class TodoComponent implements OnInit {
       },
       queryParamsHandling: 'merge',
     }).then(() => {
-      this.fetchTasks(1, this.pageSize);
+      this.currentPage = 0; // Reset currentPage to 0 when clearing search
+      this.fetchTasks(1, this.pageSize); // Fetch tasks for the first page
     });
   }
 
@@ -175,7 +168,7 @@ export class TodoComponent implements OnInit {
     this.currentPage = page;
 
     const queryParams: any = {
-      page: this.currentPage + 1,
+      page: this.currentPage + 1, // Adjust currentPage for navigation
     };
 
     if (this.searchTerm) {
@@ -197,7 +190,7 @@ export class TodoComponent implements OnInit {
       if (this.searchTerm || this.startDate || this.endDate) {
         this.searchTasks();
       } else {
-        this.fetchTasks(this.currentPage + 1, this.pageSize);
+        this.fetchTasks(this.currentPage + 1, this.pageSize); // Fetch tasks for currentPage
       }
     });
   }

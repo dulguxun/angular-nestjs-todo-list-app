@@ -80,11 +80,7 @@ export class TodoController {
     const userId = req.user.userId;
     return this.todoService.searchTasksByTitle(
       userId,
-      searchTaskDto.search || '',
-      searchTaskDto.startDate || null,
-      searchTaskDto.endDate || null,
-      searchTaskDto.page,
-      searchTaskDto.limit
+      searchTaskDto
     );
   }
 

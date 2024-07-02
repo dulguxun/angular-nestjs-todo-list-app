@@ -121,14 +121,11 @@ export class TodoService {
 
   async searchTasksByTitle(
     userId: number,
-    searchTerm: string,
-    startDate: string | null,
-    endDate: string | null,
-    page: number = 1,
-    limit: number = 10
+    searchTaskDto: SearchTaskDto
   ): Promise<{ tasks: Todotablee[], total: number }> {
     const client = await this.pool.connect();
     try {
+      const { search, startDate, endDate, page = 1, limit = 6 } = searchTaskDto;
       const offset = (page - 1) * limit;
       let searchQuery = `
         SELECT * FROM todotable
@@ -138,8 +135,8 @@ export class TodoService {
         SELECT COUNT(*) FROM todotable
         WHERE "userId" = $1 AND title ILIKE $2
       `;
-      const searchParams = [userId, `%${searchTerm}%`];
-      const countParams = [userId, `%${searchTerm}%`];
+      const searchParams = [userId, `%${search || ''}%`];
+      const countParams = [userId, `%${search || ''}%`];
       
       let paramIndex = 3;
 
