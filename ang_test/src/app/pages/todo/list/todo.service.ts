@@ -3,6 +3,14 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { end } from '@popperjs/core';
 
+export interface SearchFilter {
+  searchTerm: string;
+  startDate: string;
+  endDate: string;
+  page: number;
+  limit: number;
+}
+
 
 @Injectable({
   providedIn: 'root',
@@ -26,36 +34,28 @@ export class TodoService {
 
   searchTasks(
     token: string | null,
-    searchTerm: string,
-    startDate: string | null = null,
-    endDate: string | null = null,
+    filter: SearchFilter,
     page: number = 1,
     limit: number = 6
   ): Observable<any> {
-    console.log('service-n searchtasks:', {
-      search: searchTerm,
-      startDate: startDate,
-      endDate: endDate,
-      page: page.toString(),
-      limit: limit.toString(),
-    });
+   
 
     let params = new HttpParams()
 
-    if (searchTerm) {
-      params = params.set('search', searchTerm);
+    if (filter.searchTerm) {
+      params = params.set('search', filter.searchTerm);
     }
 
     if(page.toString) (
       params = params.set('page', page.toString())
     )
 
-    if (startDate) {
-      params = params.set('startDate', startDate);
+    if (filter.startDate) {
+      params = params.set('startDate', filter.startDate);
     }
 
-    if (endDate) {
-      params = params.set('endDate', endDate);
+    if (filter.endDate) {
+      params = params.set('endDate', filter.endDate);
     }
 
     return this.http.get(`${this.apiUrl}/search`, {

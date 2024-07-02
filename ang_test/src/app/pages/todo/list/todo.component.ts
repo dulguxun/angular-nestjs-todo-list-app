@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { TodoService } from './todo.service';
+import { TodoService, SearchFilter } from './todo.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 import { debounceTime } from 'rxjs/operators';
-import { start } from '@popperjs/core';
 
 interface Task {
   id: number;
@@ -14,16 +13,10 @@ interface Task {
   favoriteTask: boolean;
   description: string;
   user: { id: number; username: string };
-  originalPosition: number; // Add this field
+  originalPosition: number;
 }
 
-interface SearchFilter {
-  searchTerm: string;
-  startDate: string;
-  endDate: string;
-  page: number;
-  limit: number;
-}
+
 
 @Component({
   selector: 'app-todo',
@@ -54,35 +47,49 @@ export class TodoComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     this.form = this.formBuilder.group({
-      startDate: [''],  // Initialize form controls
+      startDate: [''],
       endDate: ['']
     });
   }
   
   ngOnInit(): void {
-    // this.searchTasks();
     this.form = this.formBuilder.group({
-      title: '',   
-      startDate: '',  // Initialize form controls
-      endDate: ''   
+      title: '',
+      startDate: '',
+      endDate: ''
     });
-    
+
     this.route.queryParams.subscribe(params => {
       this.searchTerm = params['title'] || '';
       this.startDate = params['startDate'] || '';
       this.endDate = params['endDate'] || '';
       this.currentPage = +params['page'] - 1 || 0;
-      
-      if (params['title'] || params['page']
-      ) {
+
+      this.form.get('title')?.setValue(this.searchTerm);
+      this.form.get('startDate')?.setValue(this.startDate);
+      this.form.get('endDate')?.setValue(this.endDate);
+
+      if (params['title'] || params['startDate'] || params['endDate'] || params['page']) {
         this.searchTasks();
       } else {
         this.fetchTasks(this.currentPage + 1, this.pageSize);
       }
     });
-    
+
     this.form.get('title')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
       this.searchTerm = this.form.get('title')?.value || '';
+      this.currentPage = 0;
+      this.searchTasks();
+    });
+
+    this.form.get('startDate')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
+      this.startDate = this.form.get('startDate')?.value || '';
+      this.currentPage = 0;
+      this.searchTasks();
+    });
+
+    this.form.get('endDate')?.valueChanges.pipe(debounceTime(400)).subscribe(() => {
+      this.endDate = this.form.get('endDate')?.value || '';
       this.currentPage = 0;
       this.searchTasks();
     });
@@ -94,13 +101,14 @@ export class TodoComponent implements OnInit {
   }
   
   fetchTasks(page: number, pageSize: number): void {
+    console.log('Fetching tasks for page:', page);
+    
     const token = localStorage.getItem('token');
     this.todoService.fetchTasks(token, page, pageSize).subscribe(
       (res: any) => {
         this.tasks = res.tasks;
         this.totalItems = res.total;
         this.updatePagination();
-        
       },
       (error: any) => {
         console.error('Error fetching tasks:', error);
@@ -112,18 +120,18 @@ export class TodoComponent implements OnInit {
     const token = localStorage.getItem('token');
     const filter: SearchFilter = {
       searchTerm: this.searchTerm,
-      startDate: this.form.get('startDate')?.value,
-      endDate: this.form.get('endDate')?.value,
+      startDate: this.startDate,
+      endDate: this.endDate,
       page: this.currentPage + 1,
       limit: this.pageSize,
     };
   
-    this.todoService.searchTasks(token, filter.searchTerm, filter.startDate, filter.endDate, filter.page, filter.limit).subscribe(
+    this.todoService.searchTasks(token, filter).subscribe(
       (response: { tasks: Task[], total: number }) => {
         this.tasks = response.tasks;
         this.totalItems = response.total;
         this.updatePagination();
-        
+  
         const queryParams = {
           title: filter.searchTerm,
           startDate: filter.startDate,
@@ -142,7 +150,7 @@ export class TodoComponent implements OnInit {
       }
     );
   }
-    
+
   clearSearch(): void {
     this.searchTerm = '';
     this.startDate = '';
@@ -150,6 +158,8 @@ export class TodoComponent implements OnInit {
     this.router.navigate([], {
       queryParams: {
         title: null,
+        startDate: null,
+        endDate: null,
         page: 1,
       },
       queryParamsHandling: 'merge',
@@ -164,27 +174,32 @@ export class TodoComponent implements OnInit {
     }
     this.currentPage = page;
 
+    const queryParams: any = {
+      page: this.currentPage + 1,
+    };
+
     if (this.searchTerm) {
-      this.router.navigate([], {
-        queryParams: {
-          title: this.searchTerm,
-         
-          page: this.currentPage + 1,
-        },
-        queryParamsHandling: 'merge',
-      }).then(() => {
-        this.searchTasks();
-      });
-    } else {
-      this.router.navigate([], {
-        queryParams: {
-          page: this.currentPage + 1,
-        },
-        queryParamsHandling: 'merge',
-      }).then(() => {
-        this.fetchTasks(this.currentPage + 1, this.pageSize);
-      });
+      queryParams['title'] = this.searchTerm;
     }
+
+    if (this.startDate) {
+      queryParams['startDate'] = this.startDate;
+    }
+
+    if (this.endDate) {
+      queryParams['endDate'] = this.endDate;
+    }
+
+    this.router.navigate([], {
+      queryParams,
+      queryParamsHandling: 'merge',
+    }).then(() => {
+      if (this.searchTerm || this.startDate || this.endDate) {
+        this.searchTasks();
+      } else {
+        this.fetchTasks(this.currentPage + 1, this.pageSize);
+      }
+    });
   }
 
   submitTodo(): void {
@@ -265,11 +280,9 @@ export class TodoComponent implements OnInit {
     this.dateFormat = this.dateFormat.includes('HH') ? 'yyyy LLL dd, hh:mm a' : 'yyyy LLL dd, HH:mm';
   }
 
-  showToastMessage(message: string): void {
+  private showToastMessage(message: string): void {
     this.toastMessage = message;
     this.showToast = true;
-    setTimeout(() => {
-      this.showToast = false;
-    }, 3000);
+    setTimeout(() => this.showToast = false, 3000);
   }
 }
