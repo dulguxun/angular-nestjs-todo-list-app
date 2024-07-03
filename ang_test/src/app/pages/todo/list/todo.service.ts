@@ -45,6 +45,10 @@ export class TodoService {
     if (filter.searchTerm) {
       params = params.set('search', filter.searchTerm);
     }
+    
+    if (filter.page){
+      params = params.set('page', filter.page.toString())
+    }
 
     if(page.toString) (
       params = params.set('page', page.toString())

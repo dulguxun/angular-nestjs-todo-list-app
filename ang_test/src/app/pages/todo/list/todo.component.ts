@@ -159,30 +159,35 @@ export class TodoComponent implements OnInit {
       return;
     }
     this.currentPage = page;
-
+  
     const queryParams: any = {
       page: this.currentPage + 1,
     };
-
+  
     if (this.searchTerm) {
       queryParams['title'] = this.searchTerm;
     }
-
+  
     if (this.startDate) {
       queryParams['startDate'] = this.startDate;
     }
-
+  
     if (this.endDate) {
       queryParams['endDate'] = this.endDate;
     }
-
+  
     this.router.navigate([], {
       queryParams,
       queryParamsHandling: 'merge',
     }).then(() => {
-      this.fetchTasks(this.currentPage + 1, this.pageSize);
+      if (this.searchTerm || this.startDate || this.endDate) {
+        this.searchTasks(false); // Call searchTasks instead of fetchTasks
+      } else {
+        this.fetchTasks(this.currentPage + 1, this.pageSize);
+      }
     });
   }
+  
 
   submitTodo(): void {
     const title = this.form.get('title')?.value;
@@ -243,13 +248,15 @@ export class TodoComponent implements OnInit {
       (res: any) => {
         task.favoriteTask = !task.favoriteTask;
         this.showToastMessage('Task updated successfully');
-
+  
         if (task.favoriteTask) {
+          // Move the favorited task to the top of the list
           this.tasks = [task, ...this.tasks.filter(t => t.id !== task.id)];
         } else {
-          this.tasks = this.tasks.filter(t => t.id !== task.id);
-          this.fetchTasks(this.currentPage + 1, this.pageSize);
-          this.updatePagination();
+          // Return the unfavorited task to its original position sorted by createdAt
+          const taskListWithoutCurrentTask = this.tasks.filter(t => t.id !== task.id);
+          taskListWithoutCurrentTask.push(task); // Push the unfavorited task back
+          this.tasks = taskListWithoutCurrentTask.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         }
       },
       (error: any) => {
@@ -258,9 +265,6 @@ export class TodoComponent implements OnInit {
     );
   }
 
-  toggleDateFormat(): void {
-    this.dateFormat = this.dateFormat.includes('HH') ? 'yyyy LLL dd, hh:mm a' : 'yyyy LLL dd, HH:mm';
-  }
 
   private showToastMessage(message: string): void {
     this.toastMessage = message;
